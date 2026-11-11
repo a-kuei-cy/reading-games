@@ -843,7 +843,7 @@ let ADMIN = { pw: null, bank: null, tab: 'passage', records: null };
 function openAdmin() {
   if (ADMIN.pw) { go('admin'); renderAdmin(); return; }
   modal(`<h3>🔐 管理者登入</h3><div class="field"><label>管理密碼</label><input type="password" id="admPw" placeholder="請輸入密碼"></div>
-    <div class="hint" style="margin-bottom:12px">${API.cloud() ? '雲端模式：密碼於 Apps Script 驗證。' : '本機示範模式：預設密碼 ' + CONFIG.DEFAULT_PW + '（登入後請到「系統設定」修改或連接試算表）。'}</div>
+    <div class="hint" style="margin-bottom:12px">${API.cloud() ? '雲端模式' : '本機示範模式：預設密碼 ' + CONFIG.DEFAULT_PW + '（登入後請到「系統設定」修改或連接試算表）。'}</div>
     <div class="btns"><button class="btn ghost" onclick="closeModal()">取消</button><button class="btn" id="admGo">登入</button></div>`, 'sm');
   const goLogin = async () => {
     const h = await sha256($('#admPw').value);
