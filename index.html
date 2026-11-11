@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>閱讀素養遊戲闖關｜興嘉國小</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF8EC; --ink:#3B2A1A; --sub:#7A6552; --line:#EADBC4;
+  --sun:#FFB627; --leaf:#4CAF7A; --sky:#4A90D9; --berry:#E8566C; --plum:#8E6CCF;
+  --card:#FFFFFF; --soft:#FFF1D6; --radius:18px;
+  --shadow:0 4px 0 rgba(59,42,26,.12), 0 10px 24px rgba(59,42,26,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",system-ui,sans-serif;font-size:17px;line-height:1.6}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:none}
+input,select,textarea{font-family:inherit;font-size:16px;color:var(--ink)}
+.hidden{display:none!important}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:10px 18px;background:var(--ink);color:#FFF8EC}
+.topbar .logo{font-weight:900;font-size:20px;letter-spacing:1px}
+.topbar .logo span{color:var(--sun)}
+.topbar .grow{flex:1}
+.topbar .who{font-size:15px;opacity:.9}
+.topbar .star-pill{background:var(--sun);color:var(--ink);font-weight:900;border-radius:99px;padding:3px 12px}
+.tbtn{background:rgba(255,255,255,.12);color:#FFF8EC;border-radius:10px;padding:6px 12px;font-size:15px}
+.tbtn:hover{background:rgba(255,255,255,.22)}
+.mode-tag{font-size:12px;padding:2px 8px;border-radius:6px;background:var(--berry);color:#fff}
+.mode-tag.cloud{background:var(--leaf)}
+
+.wrap{max-width:1100px;margin:0 auto;padding:22px 18px 60px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+h1,h2,h3{margin:.2em 0 .5em;line-height:1.3}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 20px;border-radius:14px;font-weight:700;background:var(--sun);color:var(--ink);box-shadow:0 4px 0 #C98500;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #C98500}
+.btn.green{background:var(--leaf);color:#fff;box-shadow:0 4px 0 #2F7D53}
+.btn.blue{background:var(--sky);color:#fff;box-shadow:0 4px 0 #2C64A3}
+.btn.red{background:var(--berry);color:#fff;box-shadow:0 4px 0 #A8344A}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:0 0 0 2px var(--line) inset}
+.btn.sm{padding:6px 12px;font-size:14px;border-radius:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- login ---------- */
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:center;min-height:70vh}
+.hero h1{font-size:44px;font-weight:900}
+.hero h1 em{font-style:normal;color:var(--berry)}
+.hero p{color:var(--sub);font-size:18px}
+.goal-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.goal{background:#fff;border-radius:14px;padding:10px 12px;font-size:15px;box-shadow:0 0 0 2px var(--line) inset}
+.goal b{display:block;font-size:16px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-weight:700;font-size:15px}
+.field input,.field select,.field textarea{padding:11px 12px;border:2px solid var(--line);border-radius:12px;background:#FFFDF8}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--sun)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1}
+.btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+/* ---------- map ---------- */
+.map-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{display:flex;align-items:center;gap:6px;background:#fff;border-radius:99px;padding:4px 12px 4px 6px;font-size:14px;box-shadow:0 0 0 2px var(--line) inset}
+.badge .ic{font-size:22px}
+.badge.locked{filter:grayscale(1);opacity:.45}
+.lands{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+.land{position:relative;background:#fff;border-radius:22px;padding:18px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;overflow:hidden}
+.land:hover{transform:translateY(-4px)}
+.land .num{position:absolute;top:12px;right:14px;font-weight:900;font-size:40px;color:var(--soft);line-height:1}
+.land .zone{font-size:13px;font-weight:700;color:var(--leaf);letter-spacing:1px}
+.land h3{font-size:20px;margin:.2em 0}
+.land .stars{font-size:24px;letter-spacing:2px}
+.land .meta{font-size:13px;color:var(--sub)}
+.land.locked{cursor:not-allowed;background:#F3EBDD}
+.land.locked:hover{transform:none}
+.land.locked::after{content:"🔒 完成上一關即可解鎖";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(243,235,221,.82);font-weight:700;color:var(--sub)}
+.land .bar{height:6px;border-radius:6px;margin:-18px -18px 14px;background:linear-gradient(90deg,var(--leaf),var(--sky))}
+
+/* ---------- play ---------- */
+.play{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.passage{position:sticky;top:74px;max-height:calc(100vh - 100px);overflow:auto}
+.passage h2{font-size:22px}
+.passage img{max-width:100%;border-radius:12px;margin-bottom:10px}
+.ptext{font-size:19px;line-height:2}
+.sent{border-radius:6px;padding:2px 1px;transition:background .15s}
+.ptext.clue-mode .sent{cursor:pointer;background:rgba(255,182,39,.12);box-shadow:0 2px 0 rgba(255,182,39,.5)}
+.ptext.clue-mode .sent:hover{background:rgba(255,182,39,.32)}
+.sent.picked{background:var(--sun)!important;box-shadow:none!important}
+.sent.right{background:#BDEBD0!important}
+.sent.wrong{background:#F8C6CE!important}
+.progress{display:flex;gap:6px;margin-bottom:14px}
+.progress i{flex:1;height:8px;border-radius:8px;background:var(--line)}
+.progress i.done{background:var(--leaf)}
+.progress i.miss{background:var(--berry)}
+.progress i.now{background:var(--sun)}
+.qtag{display:inline-block;font-size:13px;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--soft);color:#9A6400;margin-right:6px}
+.qtag.t{background:#E3EEFB;color:#2C64A3}
+.qtext{font-size:21px;font-weight:700;margin:10px 0 16px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{text-align:left;padding:13px 16px;border-radius:14px;background:#FFFDF8;box-shadow:0 0 0 2px var(--line) inset;font-size:18px}
+.opt:hover{box-shadow:0 0 0 2px var(--sun) inset}
+.opt.sel{box-shadow:0 0 0 3px var(--sun) inset;background:#FFF4D6}
+.opt.right{box-shadow:0 0 0 3px var(--leaf) inset;background:#E6F7EE}
+.opt.wrong{box-shadow:0 0 0 3px var(--berry) inset;background:#FDE8EB}
+.slots{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.slot{min-height:48px;border:2px dashed var(--line);border-radius:12px;display:flex;align-items:center;gap:10px;padding:6px 12px;font-size:17px}
+.slot b{display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--sky);color:#fff;align-items:center;justify-content:center;font-size:14px;flex:none}
+.slot.filled{border-style:solid;border-color:var(--sky);background:#F2F7FD;cursor:pointer}
+.slot.right{border-color:var(--leaf);background:#E6F7EE}
+.slot.wrong{border-color:var(--berry);background:#FDE8EB}
+.pool{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 14px;border-radius:12px;background:#fff;box-shadow:0 0 0 2px var(--line) inset;font-size:17px}
+.chip:hover{box-shadow:0 0 0 2px var(--sky) inset}
+.chip.used{opacity:.3;pointer-events:none}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.mcol{display:flex;flex-direction:column;gap:10px}
+.mi{padding:11px 14px;border-radius:12px;background:#fff;box-shadow:0 0 0 2px var(--line) inset;text-align:left;font-size:17px;position:relative}
+.mi.active{box-shadow:0 0 0 3px var(--sun) inset}
+.mi[data-pair]::before{content:attr(data-pair);position:absolute;left:-10px;top:-8px;width:22px;height:22px;border-radius:50%;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;background:var(--pc)}
+.mi.right{background:#E6F7EE}
+.mi.wrong{background:#FDE8EB}
+.fill-in{width:100%;padding:14px;border:2px solid var(--line);border-radius:14px;font-size:20px}
+.feedback{margin-top:16px;padding:14px 16px;border-radius:14px;font-size:16px}
+.feedback.ok{background:#E6F7EE;border-left:6px solid var(--leaf)}
+.feedback.no{background:#FDE8EB;border-left:6px solid var(--berry)}
+.actions{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px}
+.hint{font-size:14px;color:var(--sub)}
+
+/* ---------- result ---------- */
+.result{text-align:center;max-width:640px;margin:0 auto}
+.big-stars{font-size:72px;letter-spacing:8px;margin:10px 0}
+.big-stars span{display:inline-block;animation:pop .5s backwards}
+.big-stars span:nth-child(2){animation-delay:.2s}.big-stars span:nth-child(3){animation-delay:.4s}
+@keyframes pop{0%{transform:scale(0) rotate(-40deg)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.lv-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0;text-align:left}
+.lv{background:var(--soft);border-radius:12px;padding:10px 14px}
+.lv .b{height:8px;border-radius:8px;background:#fff;margin-top:6px;overflow:hidden}
+.lv .b i{display:block;height:100%;background:var(--leaf)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+
+/* ---------- admin ---------- */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.tab{padding:9px 16px;border-radius:12px;background:#fff;font-weight:700;box-shadow:0 0 0 2px var(--line) inset}
+.tab.on{background:var(--ink);color:#FFF8EC;box-shadow:none}
+table.dt{width:100%;border-collapse:collapse;font-size:15px}
+.dt th,.dt td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.dt th{background:var(--soft);position:sticky;top:0}
+.dt tr:hover td{background:#FFFBF2}
+.dt .clip{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbl-wrap{max-height:62vh;overflow:auto;border-radius:12px;box-shadow:0 0 0 2px var(--line) inset}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.toolbar select,.toolbar input{padding:8px 10px;border:2px solid var(--line);border-radius:10px}
+.pill{font-size:12px;padding:1px 8px;border-radius:99px;background:#E3EEFB;color:#2C64A3;white-space:nowrap}
+.pill.off{background:#eee;color:#999}
+.editor-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.editor-row input[type=text]{flex:1;padding:8px 10px;border:2px solid var(--line);border-radius:10px}
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--soft);border-radius:14px;padding:12px 14px}
+.stat b{font-size:26px;display:block}
+.clue-preview .sent{cursor:pointer;background:rgba(74,144,217,.08)}
+.clue-preview .sent:hover{background:rgba(74,144,217,.2)}
+
+/* ---------- modal / toast ---------- */
+.mask{position:fixed;inset:0;background:rgba(59,42,26,.45);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:20px;padding:22px;width:min(720px,100%);max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal.sm{width:min(420px,100%)}
+.modal h3{margin-top:0}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 20px;border-radius:12px;z-index:200;font-size:15px;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.loading{position:fixed;inset:0;z-index:150;background:rgba(255,248,236,.7);display:flex;align-items:center;justify-content:center;font-weight:700}
+.spinner{width:42px;height:42px;border:5px solid var(--line);border-top-color:var(--sun);border-radius:50%;animation:spin 1s linear infinite;margin-right:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media (max-width:820px){
+  .hero,.play{grid-template-columns:1fr}
+  .hero h1{font-size:34px}
+  .passage{position:static;max-height:none}
+  .goal-list,.lv-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">📖 閱讀<span>素養</span>闖關</div>
+  <span id="modeTag" class="mode-tag">本機示範</span>
+  <div class="grow"></div>
+  <span id="whoBox" class="who hidden"></span>
+  <span id="starPill" class="star-pill hidden">⭐ 0</span>
+  <button class="tbtn hidden" id="btnMap" onclick="go('map')">🗺️ 地圖</button>
+  <button class="tbtn hidden" id="btnLogout" onclick="logout()">登出</button>
+  <button class="tbtn" onclick="openAdmin()">🔧 管理</button>
+</header>
+
+<main class="wrap">
+  <!-- ========== 學生登入 ========== -->
+  <section id="v-login">
+    <div class="hero">
+      <div>
+        <h1>讀懂故事，<br><em>解開</em>每一道關卡！</h1>
+        <p>找線索、排順序、配一配、做選擇，<br>集星星解鎖新領地，換取專屬徽章。</p>
+        <div class="goal-list">
+          <div class="goal"><b>⭐ 即時回饋</b>答完立刻知道對錯與理由</div>
+          <div class="goal"><b>🔍 找線索推理</b>回到文本點出證據句</div>
+          <div class="goal"><b>🧭 情境抉擇</b>把讀到的用在生活裡</div>
+          <div class="goal"><b>🔀 多文本轉換</b>排序、配對、文字表達</div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>🎒 冒險者登記</h2>
+        <div class="row">
+          <div class="field"><label>班級</label><input id="inCls" placeholder="例：501" inputmode="numeric"></div>
+          <div class="field"><label>座號</label><input id="inNo" placeholder="例：7" inputmode="numeric"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>年級</label><select id="inGrade"><option value="">請選擇</option><option value="1">一年級</option><option value="2">二年級</option><option value="3">三年級</option><option value="4">四年級</option><option value="5">五年級</option><option value="6">六年級</option></select></div>
+          <div class="field"><label>姓名</label><input id="inName" placeholder="你的名字"></div>
+        </div>
+        <button class="btn green" style="width:100%;justify-content:center" onclick="studentLogin()">出發冒險 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 關卡地圖 ========== -->
+  <section id="v-map" class="hidden">
+    <div class="map-head">
+      <div><h1 style="margin:0">🗺️ 閱讀大地圖</h1><div class="hint">每關至少拿到 1 顆星，就能解鎖下一塊領地</div>
+        <div class="tabs" id="bandTabs" style="margin:10px 0 0"></div></div>
+      <div class="badges" id="badgeBox"></div>
+    </div>
+    <div class="lands" id="landBox"></div>
+  </section>
+
+  <!-- ========== 闖關 ========== -->
+  <section id="v-play" class="hidden">
+    <div class="play">
+      <div class="card passage">
+        <div class="hint" id="pZone"></div>
+        <h2 id="pTitle"></h2>
+        <img id="pImg" class="hidden" alt="">
+        <div class="ptext" id="pText"></div>
+      </div>
+      <div class="card">
+        <div class="progress" id="qProg"></div>
+        <div><span class="qtag" id="qLevel"></span><span class="qtag t" id="qType"></span><span class="hint" id="qNum"></span></div>
+        <div class="qtext" id="qText"></div>
+        <div id="qBody"></div>
+        <div id="qFeed"></div>
+        <div class="actions">
+          <button class="btn ghost sm" onclick="confirmBox('要離開這一關嗎？目前作答不會保留。',()=>go('map'))">✕ 離開</button>
+          <button class="btn blue" id="btnCheck" onclick="checkAnswer()">確認答案</button>
+          <button class="btn green hidden" id="btnNext" onclick="nextQ()">下一題 →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 結算 ========== -->
+  <section id="v-result" class="hidden">
+    <div class="card result">
+      <h1 id="rTitle">闖關完成！</h1>
+      <div class="big-stars" id="rStars"></div>
+      <div id="rSummary" style="font-size:19px"></div>
+      <div class="lv-grid" id="rLevels"></div>
+      <div id="rNew"></div>
+      <div class="btns" style="margin-top:18px;justify-content:center">
+        <button class="btn ghost" onclick="startStage(cur.pid)">🔁 再挑戰一次</button>
+        <button class="btn green" onclick="go('map')">🗺️ 回到地圖</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 管理介面 ========== -->
+  <section id="v-admin" class="hidden">
+    <div class="map-head">
+      <h1 style="margin:0">🔧 題庫管理後台</h1>
+      <div class="btns">
+        <button class="btn ghost sm" onclick="adminReload()">🔄 重新載入</button>
+        <button class="btn ghost sm" onclick="adminLogout()">登出管理</button>
+      </div>
+    </div>
+    <div class="tabs" id="adminTabs">
+      <button class="tab on" data-t="passage">📚 文本</button>
+      <button class="tab" data-t="question">❓ 題目</button>
+      <button class="tab" data-t="reward">🏅 獎勵</button>
+      <button class="tab" data-t="record">📊 成績紀錄</button>
+      <button class="tab" data-t="io">📦 匯入／匯出</button>
+      <button class="tab" data-t="setting">⚙️ 系統設定</button>
+    </div>
+    <div class="card" id="adminBody"></div>
+  </section>
+</main>
+
+<div id="modalRoot"></div>
+
+<script>
+/* =========================================================
+   設定
+   ========================================================= */
+const CONFIG = {
+  GAS_URL: 'https://script.google.com/macros/s/AKfycbyzImAvJflQFxeFEXimTqvIQwXku9GiDds-qK4kJdcsE4CK6PEZiGixwwD07unhKII/exec',                       // 部署後可直接寫在這裡；或在「系統設定」填入（存於瀏覽器）
+  DEFAULT_PW: 'xingjia2026'
+};
+const LEVELS = ['提取訊息','推論訊息','詮釋整合','比較評估'];
+const BANDS = ['低年級','中年級','高年級'];
+const BAND_INFO = { '低年級':{g:'1-2 年級',ic:'🌼'}, '中年級':{g:'3-4 年級',ic:'🌳'}, '高年級':{g:'5-6 年級',ic:'🏔️'}, '全年級':{g:'所有年級',ic:'🌈'} };
+const bandOf = g => (+g <= 2 ? '低年級' : +g <= 4 ? '中年級' : '高年級');
+const TYPES = {
+  choice:{name:'選擇／情境抉擇', icon:'🔘'},
+  clue:  {name:'找線索（點文本）', icon:'🔍'},
+  order: {name:'排序推理', icon:'🔢'},
+  match: {name:'配對連連看', icon:'🔗'},
+  fill:  {name:'關鍵詞表達', icon:'✏️'}
+};
+const PAIR_COLORS = ['#4A90D9','#E8566C','#4CAF7A','#8E6CCF','#FFB627','#00A6A6','#D9822B','#5C6BC0'];
+const LS = { url:'rq_gas_url', bank:'rq_local_bank_v2', rec:'rq_local_records', stu:'rq_student', prog:'rq_prog_', pw:'rq_local_pw' };
+
+/* =========================================================
+   範例題庫（本機示範模式）
+   ========================================================= */
+const SAMPLE_BANK = {
+  passages:[
+    /* ---------- 低年級（1-2）：短文、具體情節、直接提取為主 ---------- */
+    {id:'P101',關卡序:1,年級段:'低年級',領地名稱:'彩虹花園',標題:'小雞找媽媽',文本:'小雞嘰嘰在草地上玩。玩著玩著，他找不到媽媽了。嘰嘰問小鴨：「你有看到我媽媽嗎？」小鴨說：「我看到一隻母雞往大樹那邊走。」嘰嘰跑到大樹下，看到媽媽正在找蟲子。嘰嘰開心的說：「媽媽，我在這裡！」',圖片網址:'',啟用:true},
+    {id:'P102',關卡序:2,年級段:'低年級',領地名稱:'糖果小鎮',標題:'下雨天的雨傘',文本:'早上出門時，天空灰灰的。媽媽說：「今天可能會下雨，記得帶雨傘。」小安把黃色雨傘放進書包。放學時，果然下起大雨。好朋友阿哲沒有帶傘，站在門口不知道怎麼辦。小安打開雨傘說：「我們一起撐吧！」兩個人開開心心的走回家。',圖片網址:'',啟用:true},
+    {id:'P103',關卡序:3,年級段:'低年級',領地名稱:'積木王國',標題:'小熊的生日派對',文本:'星期六是小熊的生日。他邀請小兔、小猴和小豬來家裡玩。小兔送他一束紅花，小猴送他一串香蕉，小豬送他一個大蛋糕。小熊吹熄蠟燭後，把蛋糕切開，每個人都分到一塊。大家一起唱歌、玩遊戲，度過快樂的下午。',圖片網址:'',啟用:true},
+    /* ---------- 中年級（3-4）：段落較長、圖文資訊、簡單推論與計算 ---------- */
+    {id:'P201',關卡序:1,年級段:'中年級',領地名稱:'智慧山谷',標題:'螞蟻搬家',文本:'下午的天空悶悶的，雲層又厚又低。小華蹲在校園角落，發現一長排螞蟻正忙著把白色的蛋搬到高處的樹根旁。他跑去問自然老師。老師說：「螞蟻對空氣中的濕氣很敏感，當空氣變得潮濕，牠們會把卵搬到比較高、不容易淹水的地方。」小華半信半疑。沒想到，到了傍晚，果然下起一場大雷雨。第二天，小華在聯絡簿寫下：「觀察動物的行為，也能幫助我們預測天氣。」',圖片網址:'',啟用:true},
+    {id:'P202',關卡序:2,年級段:'中年級',領地名稱:'海風港口',標題:'園遊會攤位海報',文本:'【四年甲班園遊會攤位】攤位名稱：環保飲料站。販售時間：上午九點到十一點半。價格：檸檬紅茶一杯二十元，冬瓜茶一杯十五元。自備環保杯，每杯折價五元。所得將全部捐給學校愛心基金。小提醒：攤位在操場司令台左側，請依排隊動線前進。',圖片網址:'',啟用:true},
+    {id:'P203',關卡序:3,年級段:'中年級',領地名稱:'星光天文台',標題:'爺爺的老照片',文本:'整理倉庫時，阿凱發現一本泛黃的相簿。照片裡，一個瘦瘦的男孩站在稻田旁，手上拿著一頂斗笠。爺爺看了笑著說：「那是我十歲的時候，每天放學都要幫忙趕鴨子。」阿凱很驚訝，因為現在的爺爺總是穿著西裝去上書法課。爺爺說：「那時候沒有電視，我最喜歡在田埂上看書，書是向鄰居借的。」阿凱看著照片，突然覺得自己能隨時去圖書館借書，是一件很幸福的事。',圖片網址:'',啟用:true},
+    /* ---------- 高年級（5-6）：議論文、說明文、多文本整合與評估 ---------- */
+    {id:'P301',關卡序:1,年級段:'高年級',領地名稱:'古城議事廳',標題:'校園要不要設小動物角？',文本:'興嘉國小學生議會正在討論「是否在校園設置小動物角」。支持的同學認為，照顧兔子能培養責任感，也能讓大家更了解生命。反對的同學則提出擔憂：寒暑假期間沒有人照顧，而且有些同學對動物毛髮過敏。學務主任建議，若要設置，必須先完成三件事：調查全校過敏情形、排定假日照顧輪值表，以及請獸醫提供飼養指導。最後，議會決定先進行一個月的問卷調查，再做決定。',圖片網址:'',啟用:true},
+    {id:'P302',關卡序:2,年級段:'高年級',領地名稱:'雲霧森林',標題:'台灣黑熊的危機',文本:'台灣黑熊是台灣特有亞種，胸前有一塊白色的V字形斑紋，因此被稱為「月亮熊」。牠們多生活在海拔一千公尺以上的山林中，是雜食性動物，喜歡吃青剛櫟的果實，也會吃昆蟲和小型動物。秋天時，黑熊會大量進食，儲存脂肪。由於棲地被開發和非法獵捕，台灣黑熊的數量非常稀少，被列為瀕臨絕種的保育類動物。研究人員發現，不少黑熊誤踩山豬吊而受傷，因此推動回收山豬吊的行動，希望減少黑熊斷掌的悲劇。',圖片網址:'',啟用:true},
+    {id:'P303',關卡序:3,年級段:'高年級',領地名稱:'時光列車站',標題:'兩份旅遊資料',文本:'【資料一：森林小火車時刻表】第一班早上八點從平地站出發，十點抵達山頂站。第二班早上九點半出發，十一點半抵達。第三班中午十二點出發，下午兩點抵達。【資料二：山頂站公告】本週六受颱風影響，第三班列車停駛。山頂站的步道下午三點後封閉。全票一百五十元，國小學生半價。小林一家四口，包括爸爸、媽媽、讀國中的小林和讀國小的妹妹，打算週六搭火車上山，並在步道散步一小時。',圖片網址:'',啟用:true}
+  ],
+  questions:[
+    // P101 小雞找媽媽（5）
+    {id:'Q001',文本id:'P101',序:1,題型:'choice',素養層次:'提取訊息',題目:'嘰嘰找不到誰？',選項:'媽媽|小鴨|大樹|蟲子',答案:'1',解析:'故事第二句說「他找不到媽媽了」。',啟用:true},
+    {id:'Q002',文本id:'P101',序:2,題型:'choice',素養層次:'提取訊息',題目:'誰告訴嘰嘰媽媽往哪裡走？',選項:'小狗|小鴨|小貓|小鳥',答案:'2',解析:'是小鴨說看到母雞往大樹那邊走。',啟用:true},
+    {id:'Q003',文本id:'P101',序:3,題型:'clue',素養層次:'提取訊息',題目:'找線索：哪一句說出媽媽在大樹下做什麼？請點文本中的句子。',選項:'',答案:'看到媽媽正在找蟲子',解析:'媽媽在大樹下找蟲子。',啟用:true},
+    {id:'Q004',文本id:'P101',序:4,題型:'order',素養層次:'推論訊息',題目:'請把事情發生的順序排好。',選項:'嘰嘰在草地上玩|嘰嘰問小鴨|嘰嘰跑到大樹下',答案:'',解析:'先玩→找不到媽媽去問小鴨→跑到大樹下。',啟用:true},
+    {id:'Q005',文本id:'P101',序:5,題型:'choice',素養層次:'詮釋整合',題目:'找到媽媽時，嘰嘰的心情是？',選項:'難過|生氣|開心|害怕',答案:'3',解析:'文中寫「嘰嘰開心的說」。',啟用:true},
+    // P102 下雨天的雨傘（5）
+    {id:'Q006',文本id:'P102',序:1,題型:'choice',素養層次:'提取訊息',題目:'小安的雨傘是什麼顏色？',選項:'紅色|藍色|黃色|綠色',答案:'3',解析:'小安把「黃色雨傘」放進書包。',啟用:true},
+    {id:'Q007',文本id:'P102',序:2,題型:'clue',素養層次:'提取訊息',題目:'找線索：哪一句說出媽媽要小安帶雨傘的原因？',選項:'',答案:'今天可能會下雨',解析:'媽媽說今天可能會下雨。',啟用:true},
+    {id:'Q008',文本id:'P102',序:3,題型:'match',素養層次:'詮釋整合',題目:'把人物和他做的事配對起來。',選項:'媽媽=提醒帶雨傘|小安=和朋友一起撐傘|阿哲=沒有帶傘',答案:'',解析:'每個人物在故事中做的事都不一樣。',啟用:true},
+    {id:'Q009',文本id:'P102',序:4,題型:'choice',素養層次:'推論訊息',題目:'阿哲為什麼站在門口不知道怎麼辦？',選項:'他在等媽媽|他沒有帶傘|他想玩水|他忘了回家的路',答案:'2',解析:'下大雨了，阿哲卻沒有帶傘。',啟用:true},
+    {id:'Q010',文本id:'P102',序:5,題型:'choice',素養層次:'比較評估',題目:'情境題：下雨天同學沒帶傘，你可以怎麼做？',選項:'笑他沒帶傘|自己趕快跑走|邀他一起撐傘或請老師幫忙|把他的書包藏起來',答案:'3',解析:'像小安一樣主動幫忙，就是好朋友。',啟用:true},
+    // P103 小熊的生日派對（5）
+    {id:'Q011',文本id:'P103',序:1,題型:'choice',素養層次:'提取訊息',題目:'小熊的生日是星期幾？',選項:'星期一|星期三|星期六|星期日',答案:'3',解析:'第一句就說「星期六是小熊的生日」。',啟用:true},
+    {id:'Q012',文本id:'P103',序:2,題型:'match',素養層次:'提取訊息',題目:'誰送了什麼禮物？請配對。',選項:'小兔=一束紅花|小猴=一串香蕉|小豬=一個大蛋糕',答案:'',解析:'文中依序寫出三位朋友送的禮物。',啟用:true},
+    {id:'Q013',文本id:'P103',序:3,題型:'order',素養層次:'推論訊息',題目:'請把派對的順序排好。',選項:'小熊邀請朋友|朋友送禮物|小熊吹熄蠟燭|大家一起唱歌玩遊戲',答案:'',解析:'先邀請→送禮→吹蠟燭切蛋糕→唱歌玩遊戲。',啟用:true},
+    {id:'Q014',文本id:'P103',序:4,題型:'fill',素養層次:'推論訊息',題目:'小熊和朋友每人分到一塊蛋糕，蛋糕一共切成幾塊？（寫數字）',選項:'',答案:'4|四',解析:'小熊加上小兔、小猴、小豬，一共 4 個人。',啟用:true},
+    {id:'Q015',文本id:'P103',序:5,題型:'choice',素養層次:'詮釋整合',題目:'這個故事想告訴我們什麼？',選項:'生日一定要吃香蕉|和朋友分享很快樂|蛋糕越大越好|不要邀請朋友',答案:'2',解析:'小熊把蛋糕分給大家，一起度過快樂的下午。',啟用:true},
+    // P201 螞蟻搬家（6）
+    {id:'Q016',文本id:'P201',序:1,題型:'choice',素養層次:'提取訊息',題目:'小華看到螞蟻把什麼搬到高處？',選項:'葉子|食物碎屑|白色的蛋|小石頭',答案:'3',解析:'螞蟻「把白色的蛋搬到高處的樹根旁」。',啟用:true},
+    {id:'Q017',文本id:'P201',序:2,題型:'clue',素養層次:'提取訊息',題目:'找線索：哪一句說明螞蟻搬家的原因？',選項:'',答案:'當空氣變得潮濕',解析:'老師說明螞蟻感覺到潮濕，會把卵搬到不易淹水的地方。',啟用:true},
+    {id:'Q018',文本id:'P201',序:3,題型:'order',素養層次:'推論訊息',題目:'請依事情發生的先後排列。',選項:'小華發現螞蟻搬蛋|小華請教自然老師|傍晚下起大雷雨|小華在聯絡簿寫下心得',答案:'',解析:'下午觀察→請教老師→傍晚下雨→第二天寫聯絡簿。',啟用:true},
+    {id:'Q019',文本id:'P201',序:4,題型:'choice',素養層次:'推論訊息',題目:'「小華半信半疑」表示他當時的想法是？',選項:'完全相信老師|有點不太相信|很害怕螞蟻|覺得老師在生氣',答案:'2',解析:'半信半疑＝一半相信、一半懷疑。',啟用:true},
+    {id:'Q020',文本id:'P201',序:5,題型:'fill',素養層次:'詮釋整合',題目:'小華學到：觀察動物的行為，可以幫助我們預測什麼？',選項:'',答案:'天氣|下雨|氣候',解析:'聯絡簿寫著「也能幫助我們預測天氣」。',啟用:true},
+    {id:'Q021',文本id:'P201',序:6,題型:'choice',素養層次:'比較評估',題目:'如果想確認「螞蟻搬家就會下雨」是不是真的，哪個做法最好？',選項:'只看一次就下結論|問同學相不相信|多次觀察並記錄螞蟻行為和天氣|把螞蟻窩挖開來看',答案:'3',解析:'科學判斷需要多次觀察、記錄並比較，不能只靠一次經驗。',啟用:true},
+    // P202 園遊會攤位海報（6）
+    {id:'Q022',文本id:'P202',序:1,題型:'choice',素養層次:'提取訊息',題目:'環保飲料站幾點開始販售？',選項:'八點|九點|十點|十一點半',答案:'2',解析:'販售時間是上午九點到十一點半。',啟用:true},
+    {id:'Q023',文本id:'P202',序:2,題型:'fill',素養層次:'推論訊息',題目:'小芳自備環保杯買一杯檸檬紅茶，要付多少元？（寫數字）',選項:'',答案:'15|十五',解析:'20 − 5 = 15 元。',啟用:true},
+    {id:'Q024',文本id:'P202',序:3,題型:'clue',素養層次:'提取訊息',題目:'找線索：哪一句說明賺到的錢要怎麼使用？',選項:'',答案:'所得將全部捐給學校愛心基金',解析:'所得全部捐給愛心基金。',啟用:true},
+    {id:'Q025',文本id:'P202',序:4,題型:'match',素養層次:'詮釋整合',題目:'把海報上的項目和內容配對。',選項:'檸檬紅茶=一杯二十元|冬瓜茶=一杯十五元|自備環保杯=每杯折價五元',答案:'',解析:'把海報文字整理成重點資訊。',啟用:true},
+    {id:'Q026',文本id:'P202',序:5,題型:'choice',素養層次:'推論訊息',題目:'海報為什麼提供「自備環保杯折價」？',選項:'讓飲料更好喝|鼓勵減少使用一次性杯子|讓排隊更快|因為杯子賣完了',答案:'2',解析:'攤位叫「環保飲料站」，折價是為了鼓勵環保。',啟用:true},
+    {id:'Q027',文本id:'P202',序:6,題型:'choice',素養層次:'詮釋整合',題目:'小明帶三十元，沒帶杯子，想買兩杯冬瓜茶。下列哪個說法正確？',選項:'錢剛好夠|錢不夠，差五元|錢夠，還剩五元|錢夠，還剩十元',答案:'1',解析:'15 × 2 = 30 元，剛好夠。',啟用:true},
+    // P203 爺爺的老照片（5）
+    {id:'Q028',文本id:'P203',序:1,題型:'choice',素養層次:'提取訊息',題目:'照片裡的男孩是誰？',選項:'阿凱|阿凱的爸爸|十歲的爺爺|鄰居',答案:'3',解析:'爺爺說「那是我十歲的時候」。',啟用:true},
+    {id:'Q029',文本id:'P203',序:2,題型:'clue',素養層次:'提取訊息',題目:'找線索：哪一句說出爺爺小時候放學後要做的事？',選項:'',答案:'每天放學都要幫忙趕鴨子',解析:'爺爺小時候放學要趕鴨子。',啟用:true},
+    {id:'Q030',文本id:'P203',序:3,題型:'choice',素養層次:'推論訊息',題目:'阿凱為什麼「很驚訝」？',選項:'照片太舊了|爺爺小時候和現在的樣子差很多|爺爺不會寫書法|他沒看過鴨子',答案:'2',解析:'照片中是稻田邊的瘦男孩，現在的爺爺卻穿西裝上書法課。',啟用:true},
+    {id:'Q031',文本id:'P203',序:4,題型:'match',素養層次:'詮釋整合',題目:'比較過去與現在，請配對。',選項:'小時候的爺爺=向鄰居借書|現在的阿凱=到圖書館借書|現在的爺爺=穿西裝上書法課',答案:'',解析:'統整文中不同時間、不同人物的生活。',啟用:true},
+    {id:'Q032',文本id:'P203',序:5,題型:'choice',素養層次:'比較評估',題目:'阿凱最後覺得很幸福，最主要的原因是？',選項:'可以穿西裝|家裡有倉庫|隨時能到圖書館借書|不用趕鴨子',答案:'3',解析:'對比爺爺要向鄰居借書，阿凱發現自己很幸福。',啟用:true},
+    // P301 校園要不要設小動物角（6）
+    {id:'Q033',文本id:'P301',序:1,題型:'choice',素養層次:'提取訊息',題目:'學生議會在討論什麼議題？',選項:'是否增加下課時間|是否設置小動物角|是否舉辦園遊會|是否更換午餐菜單',答案:'2',解析:'第一句說明議題是「是否在校園設置小動物角」。',啟用:true},
+    {id:'Q034',文本id:'P301',序:2,題型:'match',素養層次:'詮釋整合',題目:'把各方和他們的主張配對。',選項:'支持的同學=能培養責任感、了解生命|反對的同學=假期無人照顧、有人會過敏|學務主任=設置前要先完成三件事',答案:'',解析:'議論文要先分清楚「誰」說了「什麼」。',啟用:true},
+    {id:'Q035',文本id:'P301',序:3,題型:'clue',素養層次:'提取訊息',題目:'找線索：哪一句說出議會最後的決定？',選項:'',答案:'議會決定先進行一個月的問卷調查',解析:'最後一句是決議內容。',啟用:true},
+    {id:'Q036',文本id:'P301',序:4,題型:'choice',素養層次:'推論訊息',題目:'學務主任要求「調查全校過敏情形」，主要回應哪一方的擔憂？',選項:'支持方|反對方|獸醫|家長會',答案:'2',解析:'過敏是反對方提出的問題。',啟用:true},
+    {id:'Q037',文本id:'P301',序:5,題型:'order',素養層次:'推論訊息',題目:'請依討論的過程排序。',選項:'說明討論的議題|支持方提出理由|反對方提出擔憂|學務主任提出建議|議會做出決定',答案:'',解析:'議題→正方→反方→建議→決議，是常見的討論結構。',啟用:true},
+    {id:'Q038',文本id:'P301',序:6,題型:'choice',素養層次:'比較評估',題目:'「先做問卷再決定」這個做法，最大的優點是？',選項:'可以拖延時間|先了解大家意見和實際狀況再決定|就不用照顧動物了|讓支持方一定獲勝',答案:'2',解析:'蒐集資料再決策，能讓決定更周全、更公平。',啟用:true},
+    // P302 台灣黑熊的危機（6）
+    {id:'Q039',文本id:'P302',序:1,題型:'choice',素養層次:'提取訊息',題目:'台灣黑熊為什麼被稱為「月亮熊」？',選項:'晚上才出來活動|胸前有白色V字形斑紋|喜歡看月亮|毛是黃色的',答案:'2',解析:'胸前的白色V字斑紋像彎彎的月亮。',啟用:true},
+    {id:'Q040',文本id:'P302',序:2,題型:'fill',素養層次:'提取訊息',題目:'台灣黑熊喜歡吃哪一種植物的果實？',選項:'',答案:'青剛櫟',解析:'文中寫「喜歡吃青剛櫟的果實」。',啟用:true},
+    {id:'Q041',文本id:'P302',序:3,題型:'clue',素養層次:'推論訊息',題目:'找線索：哪一句說明黑熊數量變少的原因？',選項:'',答案:'由於棲地被開發和非法獵捕',解析:'「由於……」說明了原因。',啟用:true},
+    {id:'Q042',文本id:'P302',序:4,題型:'choice',素養層次:'推論訊息',題目:'黑熊秋天大量進食、儲存脂肪，最可能的目的是？',選項:'參加比賽|度過食物較少的冬天|讓毛色更亮|吸引人類注意',答案:'2',解析:'秋天儲存能量，以應付冬天食物不足。',啟用:true},
+    {id:'Q043',文本id:'P302',序:5,題型:'match',素養層次:'詮釋整合',題目:'把說明文的重點整理成資料卡。',選項:'外型特徵=胸前白色V字斑紋|食性=雜食性|保育等級=瀕臨絕種|主要威脅=棲地開發與山豬吊',答案:'',解析:'把長文轉換成分類資料，是說明文的閱讀策略。',啟用:true},
+    {id:'Q044',文本id:'P302',序:6,題型:'choice',素養層次:'比較評估',題目:'下列哪個做法最能直接幫助台灣黑熊？',選項:'到山上餵食黑熊|支持回收山豬吊、不買野生動物製品|把黑熊帶回家養|到山上大聲唱歌',答案:'2',解析:'減少陷阱與獵捕，才能真正降低威脅；餵食反而會改變野生動物習性。',啟用:true},
+    // P303 兩份旅遊資料（6）
+    {id:'Q045',文本id:'P303',序:1,題型:'choice',素養層次:'提取訊息',題目:'第二班列車幾點抵達山頂站？',選項:'十點|十點半|十一點半|下午兩點',答案:'3',解析:'資料一：第二班九點半出發，十一點半抵達。',啟用:true},
+    {id:'Q046',文本id:'P303',序:2,題型:'clue',素養層次:'提取訊息',題目:'找線索：哪一句說明週六有一班列車不開？',選項:'',答案:'第三班列車停駛',解析:'資料二公告第三班停駛。',啟用:true},
+    {id:'Q047',文本id:'P303',序:3,題型:'choice',素養層次:'詮釋整合',題目:'小林一家週六想在步道散步一小時，可以搭哪一班車？',選項:'只能搭第一班|第一班或第二班都可以|只能搭第三班|三班都可以',答案:'2',解析:'第三班停駛；第一、二班抵達後散步一小時，都在下午三點封閉前結束。',啟用:true},
+    {id:'Q048',文本id:'P303',序:4,題型:'fill',素養層次:'推論訊息',題目:'小林一家四口的車票一共多少元？（寫數字）',選項:'',答案:'525|五百二十五',解析:'爸爸、媽媽、國中的小林買全票 150×3＝450，國小妹妹半價 75，共 525 元。',啟用:true},
+    {id:'Q049',文本id:'P303',序:5,題型:'order',素養層次:'推論訊息',題目:'週六搭第一班車，請依時間先後排列。',選項:'從平地站出發|抵達山頂站|在步道散步一小時|步道封閉',答案:'',解析:'8:00 出發→10:00 抵達→散步到 11:00→15:00 步道封閉。',啟用:true},
+    {id:'Q050',文本id:'P303',序:6,題型:'choice',素養層次:'比較評估',題目:'規劃這趟旅行時，同時閱讀兩份資料最主要的好處是？',選項:'可以少看一點字|整合時刻表和臨時公告，才能做出正確決定|只要看資料一就夠了|資料二比較漂亮',答案:'2',解析:'只看時刻表會不知道第三班停駛，多文本整合才能做出正確判斷。',啟用:true}
+  ],
+  rewards:[
+    {id:'R01',名稱:'閱讀新芽徽章',圖示:'🌱',所需星星:3,說明:'集滿 3 顆星',啟用:true},
+    {id:'R02',名稱:'線索偵探徽章',圖示:'🔍',所需星星:6,說明:'集滿 6 顆星',啟用:true},
+    {id:'R03',名稱:'推理大師徽章',圖示:'🧠',所需星星:9,說明:'本年級段全部三星通關',啟用:true},
+    {id:'R04',名稱:'閱讀王者皇冠',圖示:'👑',所需星星:15,說明:'跨年級挑戰集滿 15 顆星，可向老師兌換小禮物',啟用:true}
+  ]
+};
+
+/* =========================================================
+   工具
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const isOn = v => !(v === false || String(v).toUpperCase() === 'FALSE' || v === '否' || v === 0 || v === '0');
+const norm = s => String(s ?? '').replace(/[\s，。、！？!?,.「」『』"'：:；;（）()]/g, '').toLowerCase();
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+function toast(msg, ms = 2200) {
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), ms);
+}
+function loading(on, msg = '處理中…') {
+  let el = $('#loadingEl');
+  if (on) { if (!el) { el = document.createElement('div'); el.id = 'loadingEl'; el.className = 'loading'; document.body.appendChild(el); } el.innerHTML = `<div class="spinner"></div>${esc(msg)}`; }
+  else if (el) el.remove();
+}
+function modal(html, cls = '') {
+  const root = $('#modalRoot');
+  root.innerHTML = `<div class="mask"><div class="modal ${cls}">${html}</div></div>`;
+  return root.firstElementChild;
+}
+function closeModal() { $('#modalRoot').innerHTML = ''; }
+function confirmBox(msg, onYes, yesText = '確定') {
+  modal(`<h3>請確認</h3><p>${esc(msg)}</p><div class="btns"><button class="btn ghost" onclick="closeModal()">取消</button><button class="btn red" id="cfYes">${esc(yesText)}</button></div>`, 'sm');
+  $('#cfYes').onclick = () => { closeModal(); onYes(); };
+}
+function download(name, text, mime = 'text/plain') {
+  const blob = new Blob([text], { type: mime + ';charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function toCSV(rows, headers) {
+  const q = v => { v = v == null ? '' : (typeof v === 'object' ? JSON.stringify(v) : String(v)); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  return '﻿' + [headers.join(','), ...rows.map(r => headers.map(h => q(r[h])).join(','))].join('\r\n');
+}
+function parseCSV(text) {
+  text = text.replace(/^﻿/, '');
+  const rows = []; let row = [], f = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true;
+    else if (c === ',') { row.push(f); f = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(f); rows.push(row); row = []; f = ''; }
+    else f += c;
+  }
+  if (f !== '' || row.length) { row.push(f); rows.push(row); }
+  const h = rows.shift() || [];
+  return rows.filter(r => r.join('') !== '').map(r => Object.fromEntries(h.map((k, i) => [k.trim(), r[i] ?? ''])));
+}
+/* 斷句：保留引號 */
+function splitSentences(text) {
+  const out = String(text || '').match(/[^。！？!?]+[。！？!?]+[」』”]?|[^。！？!?]+$/g) || [];
+  return out.map(s => s.trim()).filter(Boolean);
+}
+
+/* =========================================================
+   API（雲端 GAS / 本機示範 雙模式）
+   ========================================================= */
+const API = {
+  url() { return CONFIG.GAS_URL || lsGet(LS.url, ''); },
+  cloud() { return !!this.url(); },
+  async get(params) {
+    const u = this.url() + '?' + new URLSearchParams(params);
+    const r = await fetch(u); const j = await r.json();
+    if (!j.ok) throw new Error(j.msg); return j.data;
+  },
+  async post(body) {
+    const r = await fetch(this.url(), { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+    const j = await r.json(); if (!j.ok) throw new Error(j.msg); return j;
+  },
+  localBank() { return lsGet(LS.bank, null) || JSON.parse(JSON.stringify(SAMPLE_BANK)); },
+  saveLocalBank(b) { lsSet(LS.bank, b); },
+
+  async bank() {
+    if (!this.cloud()) {
+      const b = this.localBank();
+      return { passages: b.passages.filter(p => isOn(p.啟用)), questions: b.questions.filter(q => isOn(q.啟用)), rewards: b.rewards.filter(r => isOn(r.啟用)) };
+    }
+    return this.get({ action: 'bank' });
+  },
+  async progress(cls, no) {
+    if (!this.cloud()) {
+      const best = {};
+      lsGet(LS.rec, []).filter(r => String(r.班級) === String(cls) && String(r.座號) === String(no))
+        .forEach(r => best[r.文本id] = Math.max(best[r.文本id] || 0, +r.星星 || 0));
+      return best;
+    }
+    return this.get({ action: 'progress', cls, no });
+  },
+  async submit(record) {
+    if (!this.cloud()) { const a = lsGet(LS.rec, []); a.push({ 時間: new Date().toLocaleString('zh-TW', { hour12: false }), ...record }); lsSet(LS.rec, a); return; }
+    return this.post({ action: 'submit', record });
+  },
+  /* ---- 管理 ---- */
+  async login(pw) {
+    if (!this.cloud()) { const h = lsGet(LS.pw, null) || await sha256(CONFIG.DEFAULT_PW); if (pw !== h) throw new Error('管理密碼錯誤'); return; }
+    return this.post({ action: 'login', pw });
+  },
+  async adminBank(pw) {
+    if (!this.cloud()) return this.localBank();
+    return (await this.post({ action: 'adminBank', pw })).data;
+  },
+  sheetKey: { '文本': 'passages', '題目': 'questions', '獎勵': 'rewards' },
+  async upsert(pw, sheet, row) {
+    if (!this.cloud()) {
+      const b = this.localBank(), arr = b[this.sheetKey[sheet]];
+      if (!row.id) row.id = nextLocalId(arr, { '文本': 'P', '題目': 'Q', '獎勵': 'R' }[sheet]);
+      const i = arr.findIndex(x => String(x.id) === String(row.id));
+      if (i >= 0) arr[i] = row; else arr.push(row);
+      this.saveLocalBank(b); return { id: row.id };
+    }
+    return this.post({ action: 'upsert', pw, sheet, row });
+  },
+  async remove(pw, sheet, id) {
+    if (!this.cloud()) {
+      const b = this.localBank(), k = this.sheetKey[sheet];
+      b[k] = b[k].filter(x => String(x.id) !== String(id));
+      if (sheet === '文本') b.questions = b.questions.filter(q => String(q.文本id) !== String(id));
+      this.saveLocalBank(b); return;
+    }
+    return this.post({ action: 'remove', pw, sheet, id });
+  },
+  async replaceAll(pw, sheet, rows) {
+    if (!this.cloud()) { const b = this.localBank(); b[this.sheetKey[sheet]] = rows; this.saveLocalBank(b); return; }
+    return this.post({ action: 'replaceAll', pw, sheet, rows });
+  },
+  async records(pw) {
+    if (!this.cloud()) return lsGet(LS.rec, []);
+    return (await this.post({ action: 'records', pw })).data;
+  },
+  async clearRecords(pw) {
+    if (!this.cloud()) { lsSet(LS.rec, []); return; }
+    return this.post({ action: 'clearRecords', pw });
+  },
+  async changePw(pw, newPw) {
+    if (!this.cloud()) { lsSet(LS.pw, newPw); return; }
+    return this.post({ action: 'changePw', pw, newPw });
+  }
+};
+function nextLocalId(arr, prefix) {
+  const max = arr.reduce((m, r) => Math.max(m, parseInt(String(r.id).replace(/\D/g, ''), 10) || 0), 0);
+  return prefix + String(max + 1).padStart(3, '0');
+}
+
+/* =========================================================
+   狀態與畫面切換
+   ========================================================= */
+let BANK = { passages: [], questions: [], rewards: [] };
+let STU = null;          // {班級, 座號, 姓名}
+let PROG = {};           // {文本id: 最佳星數}
+let cur = null;          // 目前闖關狀態
+
+function go(view) {
+  ['login', 'map', 'play', 'result', 'admin'].forEach(v => $('#v-' + v).classList.toggle('hidden', v !== view));
+  const inGame = !!STU && view !== 'admin';
+  ['#whoBox', '#starPill', '#btnLogout'].forEach(s => $(s).classList.toggle('hidden', !inGame));
+  $('#btnMap').classList.toggle('hidden', !(inGame && view !== 'map'));
+  if (view === 'map') renderMap();
+  window.scrollTo(0, 0);
+}
+function updateModeTag() {
+  const t = $('#modeTag');
+  if (API.cloud()) { t.textContent = '雲端題庫'; t.classList.add('cloud'); }
+  else { t.textContent = '本機示範'; t.classList.remove('cloud'); }
+}
+function totalStars() { return Object.values(PROG).reduce((a, b) => a + (+b || 0), 0); }
+function refreshTop() {
+  if (!STU) return;
+  $('#whoBox').textContent = `${STU.班級}班 ${STU.座號}號 ${STU.姓名}`;
+  $('#starPill').textContent = `⭐ ${totalStars()}`;
+}
+
+/* =========================================================
+   學生流程
+   ========================================================= */
+async function studentLogin() {
+  const 班級 = $('#inCls').value.trim(), 座號 = $('#inNo').value.trim(), 姓名 = $('#inName').value.trim(), 年級 = $('#inGrade').value;
+  if (!班級 || !座號 || !姓名 || !年級) return toast('請填寫班級、座號、年級和姓名');
+  STU = { 班級, 座號, 年級, 姓名 }; lsSet(LS.stu, STU);
+  await enterGame();
+}
+async function enterGame() {
+  loading(true, '載入題庫中…');
+  try {
+    BANK = await API.bank();
+    const local = lsGet(LS.prog + STU.班級 + '_' + STU.座號, {});
+    let remote = {};
+    try { remote = await API.progress(STU.班級, STU.座號); } catch (e) {}
+    PROG = { ...local };
+    Object.keys(remote).forEach(k => PROG[k] = Math.max(PROG[k] || 0, remote[k]));
+    saveProg();
+    refreshTop(); go('map');
+  } catch (e) { toast('題庫載入失敗：' + e.message, 4000); }
+  loading(false);
+}
+function saveProg() { lsSet(LS.prog + STU.班級 + '_' + STU.座號, PROG); }
+function logout() { confirmBox('確定要登出嗎？', () => { STU = null; VIEW_BAND = null; localStorage.removeItem(LS.stu); go('login'); }); }
+
+let VIEW_BAND = null;
+const passBand = p => p.年級段 || '全年級';
+function sortedPassages(band) {
+  band = band || VIEW_BAND || (STU ? bandOf(STU.年級) : '低年級');
+  return BANK.passages.filter(p => passBand(p) === band || passBand(p) === '全年級').sort((a, b) => (+a.關卡序 || 0) - (+b.關卡序 || 0));
+}
+function questionsOf(pid) { return BANK.questions.filter(q => String(q.文本id) === String(pid)).sort((a, b) => (+a.序 || 0) - (+b.序 || 0)); }
+
+function renderMap() {
+  const myBand = bandOf(STU.年級);
+  VIEW_BAND = VIEW_BAND || myBand;
+  $('#bandTabs').innerHTML = BANDS.filter(b => BANK.passages.some(p => passBand(p) === b)).map(b =>
+    `<button class="tab ${VIEW_BAND === b ? 'on' : ''}" onclick="VIEW_BAND='${b}';renderMap()">${BAND_INFO[b].ic} ${b}${b === myBand ? '（我的年級）' : '・挑戰'}</button>`).join('');
+  const ps = sortedPassages();
+  const ts = totalStars();
+  $('#badgeBox').innerHTML = BANK.rewards.slice().sort((a, b) => a.所需星星 - b.所需星星).map(r =>
+    `<div class="badge ${ts >= +r.所需星星 ? '' : 'locked'}" title="${esc(r.說明)}"><span class="ic">${esc(r.圖示)}</span>${esc(r.名稱)}<small>（${r.所需星星}⭐）</small></div>`).join('');
+  if (!ps.length) { $('#landBox').innerHTML = `<div class="card">${esc(VIEW_BAND)}目前還沒有關卡，請老師到管理介面新增文本與題目。</div>`; return; }
+  let unlocked = true;
+  $('#landBox').innerHTML = ps.map((p, i) => {
+    const s = PROG[p.id] || 0, n = questionsOf(p.id).length, open = unlocked;
+    unlocked = open && s > 0;
+    return `<div class="land ${open ? '' : 'locked'}" ${open && n ? `onclick="startStage('${esc(p.id)}')"` : ''}>
+      <div class="bar"></div><div class="num">${i + 1}</div>
+      <div class="zone">${BAND_INFO[passBand(p)]?.ic || ''} ${esc(p.領地名稱 || '第 ' + (i + 1) + ' 關')}</div>
+      <h3>${esc(p.標題)}</h3>
+      <div class="stars">${'⭐'.repeat(s)}${'☆'.repeat(3 - s)}</div>
+      <div class="meta">${n ? n + ' 道關卡任務' : '題目準備中'}</div></div>`;
+  }).join('');
+  refreshTop();
+}
+
+function startStage(pid) {
+  const p = BANK.passages.find(x => String(x.id) === String(pid));
+  const qs = questionsOf(pid);
+  if (!p || !qs.length) return toast('這一關還沒有題目');
+  cur = { pid, p, qs, i: 0, results: [], start: Date.now(), state: null };
+  $('#pZone').textContent = `${BAND_INFO[passBand(p)]?.ic || ''} ${passBand(p)}・${p.領地名稱 || ''}`;
+  $('#pTitle').textContent = p.標題;
+  if (p.圖片網址) { $('#pImg').src = p.圖片網址; $('#pImg').classList.remove('hidden'); } else $('#pImg').classList.add('hidden');
+  go('play'); renderQ();
+}
+
+function renderPassage(clueMode) {
+  const el = $('#pText');
+  el.classList.toggle('clue-mode', !!clueMode);
+  el.innerHTML = splitSentences(cur.p.文本).map((s, i) => `<span class="sent" data-i="${i}">${esc(s)}</span>`).join('');
+  if (clueMode) el.querySelectorAll('.sent').forEach(s => s.onclick = () => {
+    if (cur.answered) return;
+    el.querySelectorAll('.sent').forEach(x => x.classList.remove('picked'));
+    s.classList.add('picked'); cur.state = { sent: s.textContent, idx: +s.dataset.i };
+  });
+}
+
+function renderQ() {
+  const q = cur.qs[cur.i]; cur.state = null; cur.answered = false;
+  $('#qProg').innerHTML = cur.qs.map((_, i) => `<i class="${i < cur.i ? (cur.results[i].ok ? 'done' : 'miss') : i === cur.i ? 'now' : ''}"></i>`).join('');
+  $('#qLevel').textContent = q.素養層次 || '閱讀理解';
+  $('#qType').textContent = (TYPES[q.題型]?.icon || '') + ' ' + (TYPES[q.題型]?.name || q.題型);
+  $('#qNum').textContent = `第 ${cur.i + 1} / ${cur.qs.length} 題`;
+  $('#qText').textContent = q.題目;
+  $('#qFeed').innerHTML = '';
+  $('#btnCheck').classList.remove('hidden'); $('#btnNext').classList.add('hidden');
+  renderPassage(q.題型 === 'clue');
+  const body = $('#qBody');
+  const opts = String(q.選項 || '').split('|').map(s => s.trim()).filter(Boolean);
+
+  if (q.題型 === 'choice') {
+    body.innerHTML = `<div class="opts">${opts.map((o, i) => `<button class="opt" data-i="${i + 1}">${'ABCDEFGH'[i]}. ${esc(o)}</button>`).join('')}</div>`;
+    body.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      if (cur.answered) return;
+      body.querySelectorAll('.opt').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); cur.state = +b.dataset.i;
+    });
+  }
+  else if (q.題型 === 'clue') {
+    body.innerHTML = `<div class="hint">👈 請在左邊的文本中，點選能當作證據的那一句話（會變成黃色）。</div>`;
+  }
+  else if (q.題型 === 'order') {
+    const items = shuffle(opts.map((t, i) => ({ t, i })));
+    cur.state = { picked: [], items };
+    const draw = () => {
+      body.innerHTML = `<div class="slots">${opts.map((_, k) => { const it = cur.state.picked[k]; return `<div class="slot ${it ? 'filled' : ''}" data-k="${k}"><b>${k + 1}</b>${it ? esc(it.t) : '<span class="hint">點下方卡片放進來</span>'}</div>`; }).join('')}</div>
+        <div class="pool">${items.map((it, j) => `<button class="chip ${cur.state.picked.includes(it) ? 'used' : ''}" data-j="${j}">${esc(it.t)}</button>`).join('')}</div>
+        <div class="hint" style="margin-top:8px">點已放入的卡片可以拿回來。</div>`;
+      body.querySelectorAll('.chip').forEach(c => c.onclick = () => { if (cur.answered) return; cur.state.picked.push(items[+c.dataset.j]); draw(); });
+      body.querySelectorAll('.slot.filled').forEach(s => s.onclick = () => { if (cur.answered) return; cur.state.picked.splice(+s.dataset.k, 1); draw(); });
+    };
+    cur.state.draw = draw; draw();
+  }
+  else if (q.題型 === 'match') {
+    const pairs = opts.map(s => { const [l, ...r] = s.split('='); return { l: l.trim(), r: r.join('=').trim() }; });
+    const rights = shuffle(pairs.map((p, i) => ({ t: p.r, i })));
+    cur.state = { pairs, rights, map: {}, active: null };
+    const draw = () => {
+      const st = cur.state;
+      const leftHtml = pairs.map((p, i) => { const n = st.map[i]; return `<button class="mi ${st.active === i ? 'active' : ''}" data-l="${i}" ${n !== undefined ? `data-pair="${Object.keys(st.map).indexOf(String(i)) + 1}" style="--pc:${PAIR_COLORS[i % 8]}"` : ''}>${esc(p.l)}</button>`; }).join('');
+      const rightHtml = rights.map((r, j) => { const li = Object.keys(st.map).find(k => st.map[k] === j); return `<button class="mi" data-r="${j}" ${li !== undefined ? `data-pair="${Object.keys(st.map).indexOf(li) + 1}" style="--pc:${PAIR_COLORS[li % 8]}"` : ''}>${esc(r.t)}</button>`; }).join('');
+      body.innerHTML = `<div class="hint" style="margin-bottom:8px">先點左邊，再點右邊配成一對；再點一次可以取消。</div><div class="match"><div class="mcol">${leftHtml}</div><div class="mcol">${rightHtml}</div></div>`;
+      body.querySelectorAll('[data-l]').forEach(b => b.onclick = () => {
+        if (cur.answered) return; const i = +b.dataset.l;
+        if (st.map[i] !== undefined) { delete st.map[i]; st.active = null; } else st.active = st.active === i ? null : i; draw();
+      });
+      body.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
+        if (cur.answered) return; const j = +b.dataset.r;
+        const owner = Object.keys(st.map).find(k => st.map[k] === j);
+        if (owner !== undefined) { delete st.map[owner]; draw(); return; }
+        if (st.active === null) return toast('請先點左邊的項目');
+        st.map[st.active] = j; st.active = null; draw();
+      });
+    };
+    cur.state.draw = draw; draw();
+  }
+  else if (q.題型 === 'fill') {
+    body.innerHTML = `<input class="fill-in" id="fillIn" placeholder="在這裡輸入你的答案" autocomplete="off">`;
+    $('#fillIn').oninput = e => cur.state = e.target.value;
+    $('#fillIn').onkeydown = e => { if (e.key === 'Enter') checkAnswer(); };
+    setTimeout(() => $('#fillIn')?.focus(), 50);
+  }
+}
+
+function checkAnswer() {
+  const q = cur.qs[cur.i], body = $('#qBody');
+  let ok = false, given = '', correctText = '';
+  const opts = String(q.選項 || '').split('|').map(s => s.trim()).filter(Boolean);
+
+  if (q.題型 === 'choice') {
+    if (!cur.state) return toast('請先選一個答案');
+    ok = cur.state === +q.答案; given = opts[cur.state - 1];
+    correctText = opts[+q.答案 - 1];
+    body.querySelectorAll('.opt').forEach(b => { const i = +b.dataset.i; if (i === +q.答案) b.classList.add('right'); else if (i === cur.state) b.classList.add('wrong'); });
+  }
+  else if (q.題型 === 'clue') {
+    if (!cur.state) return toast('請先在文本中點選一句話');
+    const keys = String(q.答案).split('|').map(norm).filter(Boolean);
+    const hit = s => keys.some(k => norm(s).includes(k) || (k.length > 4 && k.includes(norm(s))));
+    ok = hit(cur.state.sent); given = cur.state.sent;
+    document.querySelectorAll('#pText .sent').forEach(s => { if (hit(s.textContent)) s.classList.add('right'); else if (s.classList.contains('picked')) s.classList.add('wrong'); s.classList.remove('picked'); });
+    correctText = [...document.querySelectorAll('#pText .sent.right')].map(s => s.textContent).join(' ');
+  }
+  else if (q.題型 === 'order') {
+    if (cur.state.picked.length < opts.length) return toast('請把所有卡片都排進去');
+    ok = cur.state.picked.every((it, k) => it.i === k);
+    given = cur.state.picked.map(it => it.t).join(' → ');
+    correctText = opts.join(' → ');
+    body.querySelectorAll('.slot').forEach((s, k) => s.classList.add(cur.state.picked[k].i === k ? 'right' : 'wrong'));
+    body.querySelector('.pool').innerHTML = ok ? '' : `<div class="hint">正確順序：${esc(correctText)}</div>`;
+  }
+  else if (q.題型 === 'match') {
+    const st = cur.state;
+    if (Object.keys(st.map).length < st.pairs.length) return toast('請把每一個都配對好');
+    ok = st.pairs.every((_, i) => st.rights[st.map[i]].i === i);
+    given = st.pairs.map((p, i) => p.l + '=' + st.rights[st.map[i]].t).join('｜');
+    correctText = st.pairs.map(p => p.l + '=' + p.r).join('｜');
+    body.querySelectorAll('[data-l]').forEach(b => { const i = +b.dataset.l; b.classList.add(st.rights[st.map[i]].i === i ? 'right' : 'wrong'); });
+    if (!ok) body.insertAdjacentHTML('beforeend', `<div class="hint" style="margin-top:8px">正確配對：${esc(correctText)}</div>`);
+  }
+  else if (q.題型 === 'fill') {
+    if (!String(cur.state || '').trim()) return toast('請先輸入答案');
+    const keys = String(q.答案).split('|').map(norm).filter(Boolean);
+    const g = norm(cur.state); given = cur.state;
+    ok = keys.some(k => g === k || (k.length >= 2 && g.includes(k)));
+    correctText = String(q.答案).split('|').join('、');
+    $('#fillIn').disabled = true;
+  }
+
+  cur.answered = true;
+  cur.results.push({ id: q.id, 層次: q.素養層次 || '閱讀理解', 題型: q.題型, ok, 作答: given });
+  $('#qFeed').innerHTML = `<div class="feedback ${ok ? 'ok' : 'no'}"><b>${ok ? '🎉 答對了！' : '💪 再想想看！'}</b>
+    ${!ok && q.題型 !== 'order' && q.題型 !== 'match' ? `<div>參考答案：${esc(correctText)}</div>` : ''}
+    ${q.解析 ? `<div>📝 ${esc(q.解析)}</div>` : ''}</div>`;
+  $('#btnCheck').classList.add('hidden');
+  $('#btnNext').classList.remove('hidden');
+  $('#btnNext').textContent = cur.i === cur.qs.length - 1 ? '看結果 🏁' : '下一題 →';
+  sfx(ok);
+}
+
+function nextQ() { if (cur.i < cur.qs.length - 1) { cur.i++; renderQ(); window.scrollTo(0, 0); } else finishStage(); }
+
+async function finishStage() {
+  const right = cur.results.filter(r => r.ok).length, total = cur.results.length, rate = right / total;
+  const stars = rate >= .9 ? 3 : rate >= .7 ? 2 : rate >= .5 ? 1 : 0;
+  const secs = Math.round((Date.now() - cur.start) / 1000);
+  const lv = {};
+  cur.results.forEach(r => { lv[r.層次] = lv[r.層次] || { 對: 0, 總: 0 }; lv[r.層次].總++; if (r.ok) lv[r.層次].對++; });
+
+  const beforeTotal = totalStars();
+  const prevBest = PROG[cur.pid] || 0;
+  if (stars > prevBest) { PROG[cur.pid] = stars; saveProg(); }
+  const afterTotal = totalStars();
+  const newBadges = BANK.rewards.filter(r => beforeTotal < +r.所需星星 && afterTotal >= +r.所需星星);
+  const ps = sortedPassages(passBand(cur.p) === '全年級' ? null : passBand(cur.p)), idx = ps.findIndex(p => String(p.id) === String(cur.pid));
+  const unlockNext = prevBest === 0 && stars > 0 && ps[idx + 1];
+
+  $('#rTitle').textContent = stars === 3 ? '太厲害了！完美通關！' : stars > 0 ? '闖關成功！' : '差一點點，再挑戰一次！';
+  $('#rStars').innerHTML = [0, 1, 2].map(i => `<span>${i < stars ? '⭐' : '☆'}</span>`).join('');
+  $('#rSummary').innerHTML = `答對 <b>${right}</b> / ${total} 題 ・ 用時 ${Math.floor(secs / 60)} 分 ${secs % 60} 秒`;
+  $('#rLevels').innerHTML = Object.entries(lv).map(([k, v]) => `<div class="lv"><b>${esc(k)}</b> ${v.對}/${v.總}<div class="b"><i style="width:${v.對 / v.總 * 100}%"></i></div></div>`).join('');
+  $('#rNew').innerHTML = (unlockNext ? `<div class="feedback ok">🗝️ 解鎖新領地：<b>${esc(ps[idx + 1].領地名稱 || ps[idx + 1].標題)}</b></div>` : '') +
+    newBadges.map(b => `<div class="feedback ok">${esc(b.圖示)} 獲得新徽章：<b>${esc(b.名稱)}</b>　${esc(b.說明)}</div>`).join('');
+  go('result'); refreshTop();
+  if (stars > 0) confetti();
+
+  try {
+    await API.submit({ ...STU, 文本id: cur.pid, 標題: cur.p.標題, 答對: right, 總題: total, 星星: stars, 用時秒: secs, 層次統計: lv, 作答明細: cur.results });
+  } catch (e) { toast('成績上傳失敗，已保留本機進度：' + e.message, 4000); }
+}
+
+/* 音效與彩帶 */
+let AC;
+function sfx(ok) {
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const notes = ok ? [660, 880] : [300, 220];
+    notes.forEach((f, i) => { const o = AC.createOscillator(), g = AC.createGain(); o.frequency.value = f; o.type = ok ? 'triangle' : 'sine';
+      g.gain.setValueAtTime(.15, AC.currentTime + i * .12); g.gain.exponentialRampToValueAtTime(.001, AC.currentTime + i * .12 + .25);
+      o.connect(g).connect(AC.destination); o.start(AC.currentTime + i * .12); o.stop(AC.currentTime + i * .12 + .26); });
+  } catch (e) {}
+}
+function confetti() {
+  const c = document.createElement('canvas'); c.className = 'confetti'; c.width = innerWidth; c.height = innerHeight; document.body.appendChild(c);
+  const x = c.getContext('2d'), cols = ['#FFB627', '#4CAF7A', '#4A90D9', '#E8566C', '#8E6CCF'];
+  const P = Array.from({ length: 140 }, () => ({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * .5, r: 4 + Math.random() * 6, v: 2 + Math.random() * 4, s: Math.random() * 6, c: cols[Math.floor(Math.random() * 5)] }));
+  let t = 0; (function f() { x.clearRect(0, 0, c.width, c.height); P.forEach(p => { p.y += p.v; p.x += Math.sin(t / 10 + p.s); x.fillStyle = p.c; x.fillRect(p.x, p.y, p.r, p.r * .6); }); if (++t < 180) requestAnimationFrame(f); else c.remove(); })();
+}
+
+/* =========================================================
+   管理介面
+   ========================================================= */
+let ADMIN = { pw: null, bank: null, tab: 'passage', records: null };
+
+function openAdmin() {
+  if (ADMIN.pw) { go('admin'); renderAdmin(); return; }
+  modal(`<h3>🔐 管理者登入</h3><div class="field"><label>管理密碼</label><input type="password" id="admPw" placeholder="請輸入密碼"></div>
+    <div class="hint" style="margin-bottom:12px">${API.cloud() ? '雲端模式：密碼於 Apps Script 驗證。' : '本機示範模式：預設密碼 ' + CONFIG.DEFAULT_PW + '（登入後請到「系統設定」修改或連接試算表）。'}</div>
+    <div class="btns"><button class="btn ghost" onclick="closeModal()">取消</button><button class="btn" id="admGo">登入</button></div>`, 'sm');
+  const goLogin = async () => {
+    const h = await sha256($('#admPw').value);
+    loading(true, '驗證中…');
+    try { await API.login(h); ADMIN.pw = h; closeModal(); await adminReload(); go('admin'); }
+    catch (e) { toast(e.message); }
+    loading(false);
+  };
+  $('#admGo').onclick = goLogin; $('#admPw').onkeydown = e => { if (e.key === 'Enter') goLogin(); };
+  setTimeout(() => $('#admPw')?.focus(), 50);
+}
+function adminLogout() { ADMIN = { pw: null, bank: null, tab: 'passage', records: null }; go(STU ? 'map' : 'login'); }
+async function adminReload() {
+  loading(true, '讀取試算表…');
+  try { ADMIN.bank = await API.adminBank(ADMIN.pw); ADMIN.records = null; renderAdmin(); }
+  catch (e) { toast('讀取失敗：' + e.message, 4000); }
+  loading(false);
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('#adminTabs .tab'); if (!t) return;
+  ADMIN.tab = t.dataset.t; renderAdmin();
+});
+function renderAdmin() {
+  document.querySelectorAll('#adminTabs .tab').forEach(t => t.classList.toggle('on', t.dataset.t === ADMIN.tab));
+  ({ passage: admPassages, question: admQuestions, reward: admRewards, record: admRecords, io: admIO, setting: admSetting })[ADMIN.tab]();
+}
+async function adminSave(sheet, row, msg = '已儲存') {
+  loading(true, '寫入試算表…');
+  try { await API.upsert(ADMIN.pw, sheet, row); closeModal(); toast(msg); await adminReload(); }
+  catch (e) { toast('儲存失敗：' + e.message, 4000); }
+  loading(false);
+}
+function adminDelete(sheet, id, extra = '') {
+  confirmBox(`確定刪除 ${id}？${extra}`, async () => {
+    loading(true, '刪除中…');
+    try { await API.remove(ADMIN.pw, sheet, id); toast('已刪除'); await adminReload(); }
+    catch (e) { toast('刪除失敗：' + e.message, 4000); }
+    loading(false);
+  }, '刪除');
+}
+const onOff = v => isOn(v) ? '<span class="pill">啟用</span>' : '<span class="pill off">停用</span>';
+
+/* ---- 文本 ---- */
+function admPassages() {
+  const bo = b => ['低年級', '中年級', '高年級', '全年級'].indexOf(passBand(b));
+  const fb = ADMIN.pBand || '';
+  const ps = ADMIN.bank.passages.filter(p => !fb || passBand(p) === fb).sort((a, b) => bo(a) - bo(b) || (+a.關卡序 || 0) - (+b.關卡序 || 0));
+  $('#adminBody').innerHTML = `<div class="toolbar"><select onchange="ADMIN.pBand=this.value;renderAdmin()"><option value="">全部年級段</option>${['低年級', '中年級', '高年級', '全年級'].map(b => `<option ${fb === b ? 'selected' : ''}>${b}</option>`).join('')}</select><button class="btn green sm" onclick="editPassage()">＋ 新增文本／關卡</button><span class="hint">共 ${ps.length} 篇。刪除文本會一併刪除其題目。</span></div>
+  <div class="tbl-wrap"><table class="dt"><thead><tr><th>年級段</th><th>關卡</th><th>id</th><th>領地</th><th>標題</th><th>文本</th><th>題數</th><th>狀態</th><th></th></tr></thead><tbody>
+  ${ps.map(p => `<tr><td>${BAND_INFO[passBand(p)]?.ic || ''} ${esc(passBand(p))}</td><td>${esc(p.關卡序)}</td><td>${esc(p.id)}</td><td>${esc(p.領地名稱)}</td><td><b>${esc(p.標題)}</b></td><td class="clip">${esc(p.文本)}</td>
+    <td>${ADMIN.bank.questions.filter(q => String(q.文本id) === String(p.id)).length}</td><td>${onOff(p.啟用)}</td>
+    <td style="white-space:nowrap"><button class="btn ghost sm" onclick="editPassage('${esc(p.id)}')">編輯</button> <button class="btn ghost sm" onclick="ADMIN.tab='question';ADMIN.qFilter='${esc(p.id)}';renderAdmin()">題目</button> <button class="btn red sm" onclick="adminDelete('文本','${esc(p.id)}','（題目也會刪除）')">刪</button></td></tr>`).join('') || '<tr><td colspan="9">尚無資料</td></tr>'}
+  </tbody></table></div>`;
+}
+function editPassage(id) {
+  const nb = ADMIN.pBand || '低年級';
+  const p = id ? ADMIN.bank.passages.find(x => String(x.id) === String(id)) : { 年級段: nb, 關卡序: ADMIN.bank.passages.filter(x => passBand(x) === nb).length + 1, 啟用: true };
+  modal(`<h3>${id ? '編輯' : '新增'}文本</h3>
+    <div class="row"><div class="field"><label>年級段</label><select id="eBand">${['低年級', '中年級', '高年級', '全年級'].map(b => `<option ${passBand(p) === b ? 'selected' : ''}>${b}</option>`).join('')}</select></div><div class="field"><label>關卡序（年級段內）</label><input id="eSeq" type="number" value="${esc(p.關卡序)}"></div>
+    <div class="field"><label>領地名稱</label><input id="eZone" value="${esc(p.領地名稱)}" placeholder="例：晨光森林"></div>
+    <div class="field"><label>狀態</label><select id="eOn"><option value="true">啟用</option><option value="false" ${isOn(p.啟用) ? '' : 'selected'}>停用</option></select></div></div>
+    <div class="field"><label>標題</label><input id="eTitle" value="${esc(p.標題)}"></div>
+    <div class="field"><label>文本內容（以「。！？」斷句，「找線索」題會以句為單位點選）</label><textarea id="eText" rows="9">${esc(p.文本)}</textarea></div>
+    <div class="field"><label>圖片網址（選填）</label><input id="eImg" value="${esc(p.圖片網址)}" placeholder="https://..."></div>
+    <div class="btns"><button class="btn ghost" onclick="closeModal()">取消</button><button class="btn green" id="eSave">儲存</button></div>`);
+  $('#eSave').onclick = () => {
+    const row = { id: p.id || '', 關卡序: +$('#eSeq').value || 1, 年級段: $('#eBand').value, 領地名稱: $('#eZone').value.trim(), 標題: $('#eTitle').value.trim(), 文本: $('#eText').value.trim(), 圖片網址: $('#eImg').value.trim(), 啟用: $('#eOn').value === 'true' };
+    if (!row.標題 || !row.文本) return toast('標題與文本必填');
+    adminSave('文本', row);
+  };
+}
+
+/* ---- 題目 ---- */
+function admQuestions() {
+  const f = ADMIN.qFilter || '';
+  const ps = ADMIN.bank.passages.slice().sort((a, b) => BANDS.concat('全年級').indexOf(passBand(a)) - BANDS.concat('全年級').indexOf(passBand(b)) || (+a.關卡序 || 0) - (+b.關卡序 || 0));
+  const title = id => { const p = ADMIN.bank.passages.find(p => String(p.id) === String(id)); return p ? `【${passBand(p)}】${p.標題}` : '（未知文本）'; };
+  const qs = ADMIN.bank.questions.filter(q => !f || String(q.文本id) === f).sort((a, b) => String(a.文本id).localeCompare(String(b.文本id)) || (+a.序 || 0) - (+b.序 || 0));
+  $('#adminBody').innerHTML = `<div class="toolbar">
+    <select id="qf" onchange="ADMIN.qFilter=this.value;renderAdmin()"><option value="">全部文本</option>${ps.map(p => `<option value="${esc(p.id)}" ${f === String(p.id) ? 'selected' : ''}>【${esc(passBand(p))}】${esc(p.關卡序)}. ${esc(p.標題)}</option>`).join('')}</select>
+    <button class="btn green sm" onclick="editQuestion()">＋ 新增題目</button><span class="hint">共 ${qs.length} 題</span></div>
+  <div class="tbl-wrap"><table class="dt"><thead><tr><th>id</th><th>文本</th><th>序</th><th>題型</th><th>層次</th><th>題目</th><th>狀態</th><th></th></tr></thead><tbody>
+  ${qs.map(q => `<tr><td>${esc(q.id)}</td><td>${esc(title(q.文本id))}</td><td>${esc(q.序)}</td><td>${TYPES[q.題型]?.icon || ''} ${esc(TYPES[q.題型]?.name || q.題型)}</td><td>${esc(q.素養層次)}</td><td class="clip">${esc(q.題目)}</td><td>${onOff(q.啟用)}</td>
+    <td style="white-space:nowrap"><button class="btn ghost sm" onclick="editQuestion('${esc(q.id)}')">編輯</button> <button class="btn ghost sm" onclick="editQuestion('${esc(q.id)}',true)">複製</button> <button class="btn red sm" onclick="adminDelete('題目','${esc(q.id)}')">刪</button></td></tr>`).join('') || '<tr><td colspan="8">尚無題目</td></tr>'}
+  </tbody></table></div>`;
+}
+
+function editQuestion(id, dup) {
+  const src = id ? ADMIN.bank.questions.find(x => String(x.id) === String(id)) : null;
+  const q = src ? { ...src } : { 文本id: ADMIN.qFilter || ADMIN.bank.passages[0]?.id, 題型: 'choice', 素養層次: LEVELS[0], 啟用: true };
+  if (dup) { q.id = ''; q.序 = (+q.序 || 0) + 1; }
+  if (!src) q.序 = ADMIN.bank.questions.filter(x => String(x.文本id) === String(q.文本id)).length + 1;
+  if (!ADMIN.bank.passages.length) return toast('請先新增文本');
+  const ps = ADMIN.bank.passages.slice().sort((a, b) => BANDS.concat('全年級').indexOf(passBand(a)) - BANDS.concat('全年級').indexOf(passBand(b)) || (+a.關卡序 || 0) - (+b.關卡序 || 0));
+  modal(`<h3>${id && !dup ? '編輯題目 ' + esc(q.id) : '新增題目'}</h3>
+    <div class="row"><div class="field" style="flex:2"><label>所屬文本</label><select id="qP">${ps.map(p => `<option value="${esc(p.id)}" ${String(q.文本id) === String(p.id) ? 'selected' : ''}>【${esc(passBand(p))}】${esc(p.關卡序)}. ${esc(p.標題)}</option>`).join('')}</select></div>
+    <div class="field"><label>序</label><input id="qSeq" type="number" value="${esc(q.序)}"></div>
+    <div class="field"><label>狀態</label><select id="qOn"><option value="true">啟用</option><option value="false" ${isOn(q.啟用) ? '' : 'selected'}>停用</option></select></div></div>
+    <div class="row"><div class="field"><label>題型</label><select id="qT">${Object.entries(TYPES).map(([k, v]) => `<option value="${k}" ${q.題型 === k ? 'selected' : ''}>${v.icon} ${v.name}</option>`).join('')}</select></div>
+    <div class="field"><label>素養層次</label><select id="qL">${LEVELS.map(l => `<option ${q.素養層次 === l ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>
+    <div class="field"><label>題目</label><textarea id="qQ" rows="2">${esc(q.題目)}</textarea></div>
+    <div id="qEditor"></div>
+    <div class="field"><label>解析（答題後顯示）</label><textarea id="qE" rows="2">${esc(q.解析)}</textarea></div>
+    <div class="btns"><button class="btn ghost" onclick="closeModal()">取消</button><button class="btn green" id="qSave">儲存</button></div>`);
+  const ed = { 選項: q.選項 || '', 答案: q.答案 || '' };
+  const drawEditor = () => renderTypeEditor($('#qT').value, ed, $('#qP').value);
+  $('#qT').onchange = () => { ed.選項 = ''; ed.答案 = ''; drawEditor(); };
+  $('#qP').onchange = drawEditor;
+  drawEditor();
+  $('#qSave').onclick = () => {
+    const r = collectTypeEditor($('#qT').value);
+    if (r.err) return toast(r.err);
+    const row = { id: q.id || '', 文本id: $('#qP').value, 序: +$('#qSeq').value || 1, 題型: $('#qT').value, 素養層次: $('#qL').value, 題目: $('#qQ').value.trim(), 選項: r.選項, 答案: r.答案, 解析: $('#qE').value.trim(), 啟用: $('#qOn').value === 'true' };
+    if (!row.題目) return toast('請輸入題目');
+    adminSave('題目', row);
+  };
+}
+
+function renderTypeEditor(type, ed, pid) {
+  const box = $('#qEditor');
+  const opts = String(ed.選項).split('|').filter(s => s !== '');
+  if (type === 'choice') {
+    const list = opts.length ? opts : ['', '', '', ''];
+    box.innerHTML = `<div class="field"><label>選項（圈選正確答案）</label><div id="chList">${list.map((o, i) => chRow(o, i + 1 === +ed.答案)).join('')}</div>
+      <button class="btn ghost sm" style="align-self:flex-start" onclick="document.getElementById('chList').insertAdjacentHTML('beforeend',chRow('',false))">＋ 選項</button></div>`;
+  } else if (type === 'order') {
+    box.innerHTML = `<div class="field"><label>依「正確順序」每行輸入一項（學生端會自動打亂）</label><textarea id="orT" rows="6">${esc(opts.join('\n'))}</textarea></div>`;
+  } else if (type === 'match') {
+    const pairs = opts.length ? opts.map(s => s.split('=')) : [['', ''], ['', ''], ['', '']];
+    box.innerHTML = `<div class="field"><label>配對組（左 ↔ 右，學生端右欄會打亂）</label><div id="mtList">${pairs.map(p => mtRow(p[0], p.slice(1).join('='))).join('')}</div>
+      <button class="btn ghost sm" style="align-self:flex-start" onclick="document.getElementById('mtList').insertAdjacentHTML('beforeend',mtRow('',''))">＋ 配對</button></div>`;
+  } else if (type === 'clue') {
+    const p = ADMIN.bank.passages.find(x => String(x.id) === String(pid));
+    box.innerHTML = `<div class="field"><label>證據關鍵句（點下方文本中的句子即可填入；多個可接受答案用 | 分隔）</label><input id="clA" value="${esc(ed.答案)}"></div>
+      <div class="ptext clue-preview" style="font-size:16px;line-height:1.9;background:#F7FAFE;border-radius:12px;padding:10px 12px;margin-bottom:12px">${splitSentences(p?.文本).map(s => `<span class="sent">${esc(s)}</span>`).join('')}</div>`;
+    box.querySelectorAll('.clue-preview .sent').forEach(s => s.onclick = () => { $('#clA').value = s.textContent.replace(/[。！？!?」』”]+$/, ''); });
+  } else if (type === 'fill') {
+    box.innerHTML = `<div class="field"><label>可接受的答案（每行一個；學生答案含有其中任一詞即算對，標點空白不計）</label><textarea id="flA" rows="4">${esc(String(ed.答案).split('|').join('\n'))}</textarea></div>`;
+  }
+}
+function chRow(v, on) { return `<div class="editor-row"><input type="radio" name="chOk" ${on ? 'checked' : ''}><input type="text" value="${esc(v)}" placeholder="選項內容"><button class="btn ghost sm" onclick="this.parentElement.remove()">✕</button></div>`; }
+function mtRow(l, r) { return `<div class="editor-row"><input type="text" class="ml" value="${esc(l)}" placeholder="左欄"><span>↔</span><input type="text" class="mr" value="${esc(r)}" placeholder="右欄"><button class="btn ghost sm" onclick="this.parentElement.remove()">✕</button></div>`; }
+function collectTypeEditor(type) {
+  const clean = s => s.replace(/[|=]/g, '／').trim();
+  if (type === 'choice') {
+    const rows = [...document.querySelectorAll('#chList .editor-row')].map(r => ({ t: clean(r.querySelector('input[type=text]').value), ok: r.querySelector('input[type=radio]').checked })).filter(r => r.t);
+    if (rows.length < 2) return { err: '至少需要 2 個選項' };
+    const ans = rows.findIndex(r => r.ok) + 1; if (!ans) return { err: '請圈選正確答案' };
+    return { 選項: rows.map(r => r.t).join('|'), 答案: String(ans) };
+  }
+  if (type === 'order') {
+    const items = $('#orT').value.split('\n').map(clean).filter(Boolean);
+    if (items.length < 2) return { err: '排序至少需要 2 項' };
+    return { 選項: items.join('|'), 答案: '' };
+  }
+  if (type === 'match') {
+    const ps = [...document.querySelectorAll('#mtList .editor-row')].map(r => [clean(r.querySelector('.ml').value), r.querySelector('.mr').value.replace(/\|/g, '／').trim()]).filter(p => p[0] && p[1]);
+    if (ps.length < 2) return { err: '配對至少需要 2 組' };
+    return { 選項: ps.map(p => p.join('=')).join('|'), 答案: '' };
+  }
+  if (type === 'clue') {
+    const a = $('#clA').value.trim(); if (!a) return { err: '請設定證據關鍵句' };
+    return { 選項: '', 答案: a };
+  }
+  if (type === 'fill') {
+    const a = $('#flA').value.split('\n').map(s => s.replace(/\|/g, '').trim()).filter(Boolean);
+    if (!a.length) return { err: '請至少輸入一個可接受答案' };
+    return { 選項: '', 答案: a.join('|') };
+  }
+  return { err: '未知題型' };
+}
+
+/* ---- 獎勵 ---- */
+function admRewards() {
+  const rs = ADMIN.bank.rewards.slice().sort((a, b) => a.所需星星 - b.所需星星);
+  $('#adminBody').innerHTML = `<div class="toolbar"><button class="btn green sm" onclick="editReward()">＋ 新增徽章／獎勵</button><span class="hint">學生累積星星達門檻即自動獲得；可在說明中註記可兌換的禮物。</span></div>
+  <div class="tbl-wrap"><table class="dt"><thead><tr><th>id</th><th>圖示</th><th>名稱</th><th>所需星星</th><th>說明</th><th>狀態</th><th></th></tr></thead><tbody>
+  ${rs.map(r => `<tr><td>${esc(r.id)}</td><td style="font-size:24px">${esc(r.圖示)}</td><td>${esc(r.名稱)}</td><td>${esc(r.所需星星)}</td><td>${esc(r.說明)}</td><td>${onOff(r.啟用)}</td>
+  <td style="white-space:nowrap"><button class="btn ghost sm" onclick="editReward('${esc(r.id)}')">編輯</button> <button class="btn red sm" onclick="adminDelete('獎勵','${esc(r.id)}')">刪</button></td></tr>`).join('') || '<tr><td colspan="7">尚無資料</td></tr>'}
+  </tbody></table></div>`;
+}
+function editReward(id) {
+  const r = id ? ADMIN.bank.rewards.find(x => String(x.id) === String(id)) : { 圖示: '🏅', 所需星星: 3, 啟用: true };
+  modal(`<h3>${id ? '編輯' : '新增'}獎勵</h3>
+    <div class="row"><div class="field"><label>圖示（emoji）</label><input id="rI" value="${esc(r.圖示)}"></div><div class="field" style="flex:2"><label>名稱</label><input id="rN" value="${esc(r.名稱)}"></div><div class="field"><label>所需星星</label><input id="rS" type="number" value="${esc(r.所需星星)}"></div></div>
+    <div class="field"><label>說明</label><input id="rD" value="${esc(r.說明)}"></div>
+    <div class="field"><label>狀態</label><select id="rO"><option value="true">啟用</option><option value="false" ${isOn(r.啟用) ? '' : 'selected'}>停用</option></select></div>
+    <div class="btns"><button class="btn ghost" onclick="closeModal()">取消</button><button class="btn green" id="rSave">儲存</button></div>`, 'sm');
+  $('#rSave').onclick = () => {
+    const row = { id: r.id || '', 名稱: $('#rN').value.trim(), 圖示: $('#rI').value.trim(), 所需星星: +$('#rS').value || 0, 說明: $('#rD').value.trim(), 啟用: $('#rO').value === 'true' };
+    if (!row.名稱) return toast('請輸入名稱');
+    adminSave('獎勵', row);
+  };
+}
+
+/* ---- 成績 ---- */
+async function admRecords() {
+  if (!ADMIN.records) {
+    $('#adminBody').innerHTML = '<div class="hint">讀取成績中…</div>';
+    try { ADMIN.records = await API.records(ADMIN.pw); } catch (e) { $('#adminBody').innerHTML = '讀取失敗：' + esc(e.message); return; }
+  }
+  const all = ADMIN.records;
+  const classes = [...new Set(all.map(r => String(r.班級)))].sort();
+  const fc = ADMIN.rCls || '', fp = ADMIN.rPid || '', best = !!ADMIN.rBest;
+  let rows = all.filter(r => (!fc || String(r.班級) === fc) && (!fp || String(r.文本id) === fp));
+  if (best) { const m = {}; rows.forEach(r => { const k = r.班級 + '_' + r.座號 + '_' + r.文本id; if (!m[k] || +r.星星 > +m[k].星星 || (+r.星星 === +m[k].星星 && +r.答對 > +m[k].答對)) m[k] = r; }); rows = Object.values(m); }
+  rows = rows.slice().sort((a, b) => String(a.班級).localeCompare(String(b.班級)) || (+a.座號 - +b.座號) || String(a.時間).localeCompare(String(b.時間)));
+  ADMIN.viewRows = rows;
+
+  // 統計
+  const stu = new Set(rows.map(r => r.班級 + '_' + r.座號)).size;
+  const acc = rows.reduce((s, r) => s + (+r.答對 || 0), 0) / Math.max(1, rows.reduce((s, r) => s + (+r.總題 || 0), 0));
+  const lvAgg = {};
+  rows.forEach(r => { let lv = r.層次統計; if (typeof lv === 'string') { try { lv = JSON.parse(lv); } catch (e) { lv = {}; } } Object.entries(lv || {}).forEach(([k, v]) => { lvAgg[k] = lvAgg[k] || { 對: 0, 總: 0 }; lvAgg[k].對 += +v.對 || 0; lvAgg[k].總 += +v.總 || 0; }); });
+
+  $('#adminBody').innerHTML = `<div class="toolbar">
+    <select onchange="ADMIN.rCls=this.value;admRecords()"><option value="">全部班級</option>${classes.map(c => `<option ${fc === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>
+    <select onchange="ADMIN.rPid=this.value;admRecords()"><option value="">全部關卡</option>${ADMIN.bank.passages.map(p => `<option value="${esc(p.id)}" ${fp === String(p.id) ? 'selected' : ''}>${esc(p.標題)}</option>`).join('')}</select>
+    <label style="font-size:15px"><input type="checkbox" ${best ? 'checked' : ''} onchange="ADMIN.rBest=this.checked;admRecords()"> 只看每人最佳</label>
+    <span style="flex:1"></span>
+    <button class="btn blue sm" onclick="exportRecords('csv')">⬇ 匯出 CSV（Excel）</button>
+    <button class="btn ghost sm" onclick="exportRecords('json')">⬇ JSON</button>
+    <button class="btn ghost sm" onclick="exportItemAnalysis()">⬇ 題目答對率</button>
+    <button class="btn ghost sm" onclick="ADMIN.records=null;admRecords()">🔄</button>
+    <button class="btn red sm" onclick="confirmBox('確定清空全部成績？建議先匯出備份。',async()=>{await API.clearRecords(ADMIN.pw);ADMIN.records=null;toast('已清空');admRecords();},'清空')">清空</button></div>
+  <div class="stat-cards">
+    <div class="stat">紀錄筆數<b>${rows.length}</b></div><div class="stat">參與學生<b>${stu}</b></div><div class="stat">平均答對率<b>${rows.length ? Math.round(acc * 100) + '%' : '—'}</b></div>
+    ${Object.entries(lvAgg).map(([k, v]) => `<div class="stat">${esc(k)}<b>${Math.round(v.對 / Math.max(1, v.總) * 100)}%</b></div>`).join('')}
+  </div>
+  <div class="tbl-wrap"><table class="dt"><thead><tr><th>時間</th><th>班級</th><th>座號</th><th>年級</th><th>姓名</th><th>關卡</th><th>答對</th><th>星星</th><th>用時</th></tr></thead><tbody>
+  ${rows.map(r => `<tr><td>${esc(r.時間)}</td><td>${esc(r.班級)}</td><td>${esc(r.座號)}</td><td>${esc(r.年級)}</td><td>${esc(r.姓名)}</td><td>${esc(r.標題)}</td><td>${esc(r.答對)}/${esc(r.總題)}</td><td>${'⭐'.repeat(+r.星星 || 0)}</td><td>${esc(r.用時秒)}s</td></tr>`).join('') || '<tr><td colspan="9">尚無紀錄</td></tr>'}
+  </tbody></table></div>`;
+}
+function exportRecords(fmt) {
+  const rows = ADMIN.viewRows || [];
+  const stamp = new Date().toISOString().slice(0, 10);
+  if (fmt === 'json') return download(`閱讀闖關成績_${stamp}.json`, JSON.stringify(rows, null, 2), 'application/json');
+  // 展開層次統計為欄位
+  const flat = rows.map(r => {
+    let lv = r.層次統計; if (typeof lv === 'string') { try { lv = JSON.parse(lv); } catch (e) { lv = {}; } }
+    const p = ADMIN.bank.passages.find(x => String(x.id) === String(r.文本id));
+    const o = { 時間: r.時間, 班級: r.班級, 座號: r.座號, 年級: r.年級, 姓名: r.姓名, 年級段: p ? passBand(p) : '', 文本id: r.文本id, 標題: r.標題, 答對: r.答對, 總題: r.總題, 答對率: r.總題 ? Math.round(r.答對 / r.總題 * 100) + '%' : '', 星星: r.星星, 用時秒: r.用時秒 };
+    LEVELS.forEach(l => o[l] = lv && lv[l] ? `${lv[l].對}/${lv[l].總}` : '');
+    return o;
+  });
+  download(`閱讀闖關成績_${stamp}.csv`, toCSV(flat, ['時間', '班級', '座號', '年級', '姓名', '年級段', '文本id', '標題', '答對', '總題', '答對率', '星星', '用時秒', ...LEVELS]), 'text/csv');
+}
+function exportItemAnalysis() {
+  const agg = {};
+  (ADMIN.viewRows || []).forEach(r => {
+    let d = r.作答明細; if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = []; } }
+    (d || []).forEach(x => { agg[x.id] = agg[x.id] || { 對: 0, 總: 0 }; agg[x.id].總++; if (x.ok) agg[x.id].對++; });
+  });
+  const rows = Object.entries(agg).map(([id, v]) => {
+    const q = ADMIN.bank.questions.find(x => String(x.id) === id) || {};
+    const p = ADMIN.bank.passages.find(x => String(x.id) === String(q.文本id)) || {};
+    return { 題目id: id, 年級段: p.id ? passBand(p) : '', 文本: p.標題 || '', 題型: TYPES[q.題型]?.name || q.題型 || '', 素養層次: q.素養層次 || '', 題目: q.題目 || '', 作答人次: v.總, 答對人次: v.對, 答對率: Math.round(v.對 / v.總 * 100) + '%' };
+  }).sort((a, b) => parseInt(a.答對率) - parseInt(b.答對率));
+  if (!rows.length) return toast('目前沒有作答明細');
+  download(`題目答對率分析_${new Date().toISOString().slice(0, 10)}.csv`, toCSV(rows, ['題目id', '年級段', '文本', '題型', '素養層次', '題目', '作答人次', '答對人次', '答對率']), 'text/csv');
+}
+
+/* ---- 匯入匯出 ---- */
+const SHEET_HEAD = {
+  文本: ['id', '關卡序', '年級段', '領地名稱', '標題', '文本', '圖片網址', '啟用'],
+  題目: ['id', '文本id', '序', '題型', '素養層次', '題目', '選項', '答案', '解析', '啟用'],
+  獎勵: ['id', '名稱', '圖示', '所需星星', '說明', '啟用']
+};
+function admIO() {
+  $('#adminBody').innerHTML = `
+  <h3>⬇ 匯出題庫</h3>
+  <div class="toolbar">
+    <button class="btn blue sm" onclick="download('閱讀闖關題庫_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(ADMIN.bank,null,2),'application/json')">完整題庫 JSON</button>
+    <button class="btn ghost sm" onclick="download('文本.csv',toCSV(ADMIN.bank.passages,SHEET_HEAD.文本),'text/csv')">文本 CSV</button>
+    <button class="btn ghost sm" onclick="download('題目.csv',toCSV(ADMIN.bank.questions,SHEET_HEAD.題目),'text/csv')">題目 CSV</button>
+    <button class="btn ghost sm" onclick="download('獎勵.csv',toCSV(ADMIN.bank.rewards,SHEET_HEAD.獎勵),'text/csv')">獎勵 CSV</button>
+    <button class="btn ghost sm" onclick="download('題目範本.csv',toCSV([],SHEET_HEAD.題目),'text/csv')">空白題目範本</button>
+  </div>
+  <h3 style="margin-top:20px">📚 內建題庫（50 題・分年級段）</h3>
+  <div class="hint">低年級 3 篇 15 題、中年級 3 篇 17 題、高年級 3 篇 18 題，涵蓋 5 種題型與 4 個素養層次。</div>
+  <div class="toolbar" style="margin-top:8px">
+    <button class="btn green sm" onclick="loadBuiltin('replace')">寫入內建題庫（覆蓋文本／題目／獎勵）</button>
+    <button class="btn ghost sm" onclick="loadBuiltin('merge')">合併加入（同 id 會被覆寫）</button>
+  </div>
+  <h3 style="margin-top:20px">⬆ 匯入題庫</h3>
+  <div class="hint">JSON：可一次覆蓋文本／題目／獎勵（格式同匯出）。CSV：選擇要匯入的工作表，欄位名稱需與範本相同。</div>
+  <div class="toolbar" style="margin-top:10px">
+    <select id="ioSheet"><option value="ALL">完整題庫（JSON）</option><option>文本</option><option>題目</option><option>獎勵</option></select>
+    <select id="ioMode"><option value="merge">合併（同 id 覆寫，新 id 新增）</option><option value="replace">整張覆蓋</option></select>
+    <input type="file" id="ioFile" accept=".json,.csv">
+    <button class="btn green sm" onclick="doImport()">開始匯入</button>
+  </div>
+  <h3 style="margin-top:20px">📋 題型欄位格式（直接在試算表編輯時參考）</h3>
+  <table class="dt"><thead><tr><th>題型代碼</th><th>選項欄</th><th>答案欄</th></tr></thead><tbody>
+    <tr><td>choice</td><td>選項A|選項B|選項C|選項D</td><td>正確選項序號（1 起算）</td></tr>
+    <tr><td>clue</td><td>（空白）</td><td>證據句關鍵片段，多個用 | 分隔</td></tr>
+    <tr><td>order</td><td>依正確順序：事件1|事件2|事件3</td><td>（空白）</td></tr>
+    <tr><td>match</td><td>左1=右1|左2=右2|左3=右3</td><td>（空白）</td></tr>
+    <tr><td>fill</td><td>（空白）</td><td>可接受答案1|答案2|答案3</td></tr>
+  </tbody></table>
+  <div class="hint" style="margin-top:6px">素養層次建議值：${LEVELS.join('、')}。啟用欄填 TRUE / FALSE。</div>`;
+}
+function loadBuiltin(mode) {
+  confirmBox(mode === 'replace' ? '將以內建 50 題覆蓋目前的文本、題目和獎勵（成績不受影響），建議先匯出備份。' : '將內建題庫合併進目前題庫，同 id 的資料會被覆寫。', async () => {
+    loading(true, '寫入內建題庫…');
+    try {
+      const key = { '文本': 'passages', '題目': 'questions', '獎勵': 'rewards' };
+      for (const sh of ['文本', '題目', '獎勵']) {
+        let rows = JSON.parse(JSON.stringify(SAMPLE_BANK[key[sh]]));
+        if (mode === 'merge') { const cur = ADMIN.bank[key[sh]].slice(); rows.forEach(r => { const i = cur.findIndex(x => String(x.id) === String(r.id)); if (i >= 0) cur[i] = r; else cur.push(r); }); rows = cur; }
+        await API.replaceAll(ADMIN.pw, sh, rows);
+      }
+      toast('內建題庫已寫入'); await adminReload();
+    } catch (e) { toast('寫入失敗：' + e.message, 4000); }
+    loading(false);
+  }, '寫入');
+}
+async function doImport() {
+  const f = $('#ioFile').files[0]; if (!f) return toast('請選擇檔案');
+  const sheet = $('#ioSheet').value, mode = $('#ioMode').value;
+  const text = await f.text();
+  let plan = {};
+  try {
+    if (sheet === 'ALL') {
+      const j = JSON.parse(text);
+      if (j.passages) plan['文本'] = j.passages; if (j.questions) plan['題目'] = j.questions; if (j.rewards) plan['獎勵'] = j.rewards;
+    } else plan[sheet] = f.name.endsWith('.json') ? JSON.parse(text) : parseCSV(text);
+  } catch (e) { return toast('檔案解析失敗：' + e.message, 4000); }
+  const summary = Object.entries(plan).map(([k, v]) => `${k} ${v.length} 筆`).join('、');
+  if (!summary) return toast('檔案中沒有可匯入的資料');
+  confirmBox(`將以「${mode === 'replace' ? '整張覆蓋' : '合併'}」方式匯入：${summary}。`, async () => {
+    loading(true, '匯入中…');
+    try {
+      const key = { '文本': 'passages', '題目': 'questions', '獎勵': 'rewards' };
+      for (const [sh, rows] of Object.entries(plan)) {
+        let final = rows.map(r => Object.fromEntries(SHEET_HEAD[sh].map(h => [h, r[h] ?? ''])));
+        if (mode === 'merge') {
+          const cur = ADMIN.bank[key[sh]].slice();
+          const prefix = { '文本': 'P', '題目': 'Q', '獎勵': 'R' }[sh];
+          final.forEach(r => { if (!r.id) r.id = nextLocalId(cur, prefix); const i = cur.findIndex(x => String(x.id) === String(r.id)); if (i >= 0) cur[i] = r; else cur.push(r); });
+          final = cur;
+        }
+        await API.replaceAll(ADMIN.pw, sh, final);
+      }
+      toast('匯入完成'); await adminReload();
+    } catch (e) { toast('匯入失敗：' + e.message, 4000); }
+    loading(false);
+  }, '匯入');
+}
+
+/* ---- 系統設定 ---- */
+function admSetting() {
+  $('#adminBody').innerHTML = `
+  <h3>☁️ 連接 Google 試算表（GAS 網址）</h3>
+  <div class="field"><input id="setUrl" value="${esc(API.url())}" placeholder="https://script.google.com/macros/s/.../exec" ${CONFIG.GAS_URL ? 'disabled' : ''}></div>
+  <div class="toolbar">
+    <button class="btn green sm" onclick="saveUrl()" ${CONFIG.GAS_URL ? 'disabled' : ''}>儲存並測試</button>
+    <button class="btn ghost sm" onclick="lsSet(LS.url,'');updateModeTag();adminLogout();toast('已切回本機示範模式')" ${CONFIG.GAS_URL ? 'disabled' : ''}>改用本機示範</button>
+    <span class="hint">${CONFIG.GAS_URL ? '網址已寫死在程式 CONFIG 中。' : '網址存在此瀏覽器；正式上線建議寫進 index.html 的 CONFIG.GAS_URL。'}</span>
+  </div>
+  ${!API.cloud() ? `<div class="toolbar"><button class="btn ghost sm" onclick="confirmBox('將本機題庫重設為範例題庫？',()=>{localStorage.removeItem(LS.bank);adminReload();toast('已重設')})">重設本機範例題庫</button></div>` : ''}
+  <h3 style="margin-top:20px">🔑 修改管理密碼</h3>
+  <div class="row" style="max-width:520px"><div class="field"><input type="password" id="np1" placeholder="新密碼"></div><div class="field"><input type="password" id="np2" placeholder="再輸入一次"></div></div>
+  <button class="btn sm" onclick="changePw()">更新密碼</button>
+  <h3 style="margin-top:24px">📘 部署步驟</h3>
+  <ol style="font-size:15px;color:var(--sub)">
+    <li>建立 Google 試算表 → 擴充功能 → Apps Script，貼上 <b>Code.gs</b>。</li>
+    <li>選擇函式 <b>setup</b> 執行一次（授權），會建立「文本／題目／成績／獎勵」四張工作表；接著在「匯入／匯出」按「寫入內建題庫」放入 50 題。</li>
+    <li>部署 → 新增部署作業 → 類型「網頁應用程式」，執行身分「我」、存取權「所有人」。</li>
+    <li>複製 /exec 網址貼到上方；預設管理密碼 <b>${CONFIG.DEFAULT_PW}</b>，請立即修改。</li>
+    <li>之後修改 Code.gs 要「管理部署作業 → 編輯 → 新版本」，網址不變。</li>
+  </ol>`;
+}
+async function saveUrl() {
+  const u = $('#setUrl').value.trim();
+  if (u && !/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)) return toast('網址格式應為 https://script.google.com/.../exec');
+  loading(true, '測試連線…');
+  try {
+    if (u) { const r = await fetch(u + '?action=ping'); const j = await r.json(); if (!j.ok) throw new Error(j.msg); }
+    lsSet(LS.url, u); updateModeTag(); loading(false);
+    toast('連線成功，請用雲端管理密碼重新登入'); adminLogout(); openAdmin();
+  } catch (e) { loading(false); toast('連線失敗：' + e.message, 4000); }
+}
+async function changePw() {
+  const a = $('#np1').value, b = $('#np2').value;
+  if (a.length < 6) return toast('密碼至少 6 碼'); if (a !== b) return toast('兩次輸入不同');
+  loading(true);
+  try { const h = await sha256(a); await API.changePw(ADMIN.pw, h); ADMIN.pw = h; toast('密碼已更新'); $('#np1').value = $('#np2').value = ''; }
+  catch (e) { toast('更新失敗：' + e.message, 4000); }
+  loading(false);
+}
+
+/* =========================================================
+   啟動
+   ========================================================= */
+(function init() {
+  updateModeTag();
+  const s = lsGet(LS.stu, null);
+  $('#inCls').addEventListener('input', e => { const g = String(e.target.value).trim()[0]; if (/[1-6]/.test(g) && String(e.target.value).trim().length >= 3) $('#inGrade').value = g; });
+  if (s && s.年級) { STU = s; $('#inCls').value = s.班級; $('#inNo').value = s.座號; $('#inGrade').value = s.年級; $('#inName').value = s.姓名; enterGame(); }
+  else go('login');
+})();
+</script>
+</body>
+</html>
